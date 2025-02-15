@@ -7,8 +7,8 @@ test_reg = []
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        history.append(request.get_data())
-        return request.get_data()
+        history.append(request.get_json())
+        return request.get_json()
     else:
         try:
             return history[-1]
@@ -18,8 +18,8 @@ def login():
 @app.route('/registration', methods = ['GET', 'POST'])
 def registration():
     if request.method == 'POST':
-        test_reg.append(request.get_data())
-        return request.get_data()['login']
+        test_reg.append(request.get_json())
+        return request.get_json()
     else:
         try:
             return test_reg[-1]

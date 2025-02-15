@@ -27,7 +27,8 @@ def registration():
     reg_password1 = Entry()
     title_password2 = Label(text = 'Еще раз пароль:')
     reg_password2 = Entry(show = '*')
-    button_registr = Button(text = 'Зарегистрироваться')
+    button_regist = Button(text = 'Зарегистрироваться', command = lambda: requests.post('http://127.0.0.1:5000/registration', json = {'login': reg_login.get(),
+                                                                     'password': reg_password1.get()}))
     main_title.pack()
     button_back.pack()
     log_title.pack()
@@ -36,13 +37,8 @@ def registration():
     reg_password1.pack()
     title_password2.pack()
     reg_password2.pack()
-    button_registr.pack()
+    button_regist.pack()
     
-    if reg_login and reg_password1:
-        r = requests.post('http://127.0.0.1:5000/registration', json = {'login': reg_login,
-                                                                    'password': reg_password1})
-    
-
 def login():
     clear()
     main_title = Label(text = 'Теперь вы можете войти в систему.')
@@ -51,7 +47,8 @@ def login():
     reg_login = Entry()
     password_title = Label(text = 'Введите ваш пароль: ')
     reg_password = Entry(show = '*')
-    button_enter = Button(text = 'Войти')
+    button_enter = Button(text = 'Войти', command = lambda: requests.post('http://127.0.0.1:5000/login', json = {'login': reg_login.get(),
+                                                                     'password': reg_password.get()}))
     main_title.pack()
     button_back.pack()
     login_title.pack()
