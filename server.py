@@ -12,9 +12,8 @@ my_db = mysql.connector.connect(
 )
 my_cursor = my_db.cursor()
 insert_reg = "INSERT INTO users (id, login, password) VALUES (%s, %s, %s)"
-select_id =  "SELECT id FROM users ORDER BY id DESC LIMIT 1"
+select_last_id =  "SELECT id FROM users ORDER BY id DESC LIMIT 1"
 select_login = "SELECT login FROM users WHERE login = %s;"
-
 
 app = Flask("server")
 history = []
@@ -23,7 +22,7 @@ test_reg = []
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        history.append(request.get_json())
+        
         print(request.get_json())
         return request.get_json()
     else:
@@ -36,12 +35,18 @@ def login():
 def registration():
     if request.method == 'POST':
         responce = request.get_json()
-        my_cursor.execute(select_id)
-        id_result = my_cursor.fetchone()
-        person = (id_result[0] + 1, responce['login'],  responce['password'])
-        my_cursor.execute(insert_reg, person)
-        my_db.commit()
-        return request.get_json()
+        my_cursor.execute(select_last_id)
+        last_id = my_cursor.fetchone()
+
+        my_cursor.execute(select_login, (responce['login'],))
+        login_coincidences = my_cursor.fetchall()
+        if len(login_coincidences) != 0:
+            return 'Denied'
+        else:
+            user = (last_id[0] + 1, responce['login'],  responce['password'])
+            my_cursor.execute(insert_reg, user)
+            my_db.commit()
+        return 'Success'
     else:
         try:
             return test_reg[-1]
