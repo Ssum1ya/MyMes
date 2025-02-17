@@ -1,4 +1,17 @@
+import database_config as cfg
+
 from flask import Flask, url_for, request
+import mysql.connector
+
+my_db = mysql.connector.connect(
+    host = cfg.host,
+    user = cfg.user,
+    auth_plugin = cfg.auth_plugin,
+    passwd = cfg.passwd,
+    database = cfg.database
+)
+my_cursor = my_db.cursor()
+insert_reg = "INSERT INTO users (id, login, password) VALUES (%s, %s, %s)"
 
 app = Flask("server")
 history = []
