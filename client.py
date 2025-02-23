@@ -1,3 +1,4 @@
+import tkinter
 from tkinter import *
 from tkinter import messagebox
 import requests
@@ -5,6 +6,34 @@ import requests
 root = Tk()
 root.geometry('400x600')
 root.title('Войти в систему')
+
+def chat():
+    clear()
+    messages_frame = tkinter.Frame(root)
+    my_msg = tkinter.StringVar()
+    my_msg.set("Введите ваше сообщение здесь.")
+    scrollbar = tkinter.Scrollbar(messages_frame)
+
+    msg_list = tkinter.Listbox(messages_frame, height=15, width=50, yscrollcommand=scrollbar.set)
+    scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
+    msg_list.pack(side=tkinter.LEFT, fill=tkinter.BOTH)
+    msg_list.pack()
+    messages_frame.pack()
+
+    entry_field = tkinter.Entry(root, textvariable=my_msg)
+    entry_field.bind("<Return>")
+    entry_field.pack()
+    send_button = tkinter.Button(root, text="отправить")
+    send_button.pack()
+    root.protocol("WM_DELETE_WINDOW")
+
+def reg(login, password):
+    request = requests.post('http://127.0.0.1:5000/registration', json = {'login': login,
+                                                                     'password': password})
+    if request.content == b'Success':
+        chat()
+    elif request.content == b'Denied':
+        pass
 
 def clear():
     for widget in root.winfo_children():
@@ -27,8 +56,7 @@ def registration():
     reg_password1 = Entry()
     title_password2 = Label(text = 'Еще раз пароль:')
     reg_password2 = Entry(show = '*')
-    button_regist = Button(text = 'Зарегистрироваться', command = lambda: requests.post('http://127.0.0.1:5000/registration', json = {'login': reg_login.get(),
-                                                                     'password': reg_password1.get()}))
+    button_regist = Button(text = 'Зарегистрироваться', command = lambda: reg(reg_login.get(), reg_password1.get()))
     main_title.pack()
     button_back.pack()
     log_title.pack()
