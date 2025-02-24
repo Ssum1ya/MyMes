@@ -17,7 +17,6 @@ check_login_for_registration = "SELECT login FROM users WHERE login = %s;"
 check_login_password = "SELECT login, password FROM users WHERE login = %s AND password = %s;"
 
 app = Flask("server")
-history = []
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():

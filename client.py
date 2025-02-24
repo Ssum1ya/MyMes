@@ -10,6 +10,10 @@ root.title('Войти в систему')
 login = None
 password = None
 
+def clear():
+    for widget in root.winfo_children():
+    	widget.destroy()
+
 def chat():
     clear()
     messages_frame = tkinter.Frame(root)
@@ -32,32 +36,6 @@ def chat():
     button_back.pack()
     send_button.pack()
     root.protocol("WM_DELETE_WINDOW")
-
-def reg(user_login, password1, password2):
-    if password1 != password2:
-        messagebox.showinfo('Ошибка', 'Не удалось зарегестрироваться так как пароли не совпадают')
-        registration()
-    else:
-        request = requests.post('http://127.0.0.1:5000/registration', json = {'login': user_login,
-                                                                        'password': password1})
-        if request.content == b'Success':
-            login()
-        elif request.content == b'Denied':
-            messagebox.showinfo('Ошибка', 'Не удалось зарегестрироваться так как такой логин уже есть')
-            choise()
-
-def log(user_login, user_password):
-    request = requests.post('http://127.0.0.1:5000/login', json = {'login': user_login,
-                                                         'password': user_password})
-    if request.content == b'Success':
-        chat()
-    elif request.content == b'Denied':
-        messagebox.showinfo('Ошибка', 'войти так как не удалось найти совпадения')
-        login()
-
-def clear():
-    for widget in root.winfo_children():
-    	widget.destroy()
 
 def choise():
     clear()
@@ -86,6 +64,19 @@ def registration():
     title_password2.pack()
     reg_password2.pack()
     button_regist.pack()
+
+def reg(user_login, password1, password2):
+    if password1 != password2:
+        messagebox.showinfo('Ошибка', 'Не удалось зарегестрироваться так как пароли не совпадают')
+        registration()
+    else:
+        request = requests.post('http://127.0.0.1:5000/registration', json = {'login': user_login,
+                                                                        'password': password1})
+        if request.content == b'Success':
+            login()
+        elif request.content == b'Denied':
+            messagebox.showinfo('Ошибка', 'Не удалось зарегестрироваться так как такой логин уже есть')
+            choise()
     
 def login():
     clear()
@@ -103,6 +94,15 @@ def login():
     password_title.pack()
     reg_password.pack()
     button_enter.pack()
+
+def log(user_login, user_password):
+    request = requests.post('http://127.0.0.1:5000/login', json = {'login': user_login,
+                                                         'password': user_password})
+    if request.content == b'Success':
+        chat()
+    elif request.content == b'Denied':
+        messagebox.showinfo('Ошибка', 'войти так как не удалось найти совпадения')
+        login()
 
 choise()
 root.mainloop()
