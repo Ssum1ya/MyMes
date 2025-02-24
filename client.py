@@ -46,6 +46,15 @@ def reg(user_login, password1, password2):
             messagebox.showinfo('Ошибка', 'Не удалось зарегестрироваться так как такой логин уже есть')
             choise()
 
+def log(user_login, user_password):
+    request = requests.post('http://127.0.0.1:5000/login', json = {'login': user_login,
+                                                         'password': user_password})
+    if request.content == b'Success':
+        chat()
+    elif request.content == b'Denied':
+        messagebox.showinfo('Ошибка', 'войти так как не удалось найти совпадения')
+        login()
+
 def clear():
     for widget in root.winfo_children():
     	widget.destroy()
@@ -86,8 +95,7 @@ def login():
     reg_login = Entry()
     password_title = Label(text = 'Введите ваш пароль: ')
     reg_password = Entry(show = '*')
-    button_enter = Button(text = 'Войти', command = lambda: requests.post('http://127.0.0.1:5000/login', json = {'login': reg_login.get(),
-                                                                     'password': reg_password.get()}))
+    button_enter = Button(text = 'Войти', command = lambda: log(reg_login.get(), reg_password.get()))
     main_title.pack()
     button_back.pack()
     login_title.pack()
