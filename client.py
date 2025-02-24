@@ -7,7 +7,7 @@ root = Tk()
 root.geometry('400x600')
 root.title('Войти в систему')
 
-login = None
+User_login = None
 password = None
 
 def clear():
@@ -32,10 +32,18 @@ def chat():
     entry_field = tkinter.Entry(root, textvariable=my_msg)
     entry_field.bind("<Return>")
     entry_field.pack()
-    send_button = tkinter.Button(root, text="отправить")
+    send_button = tkinter.Button(root, text="отправить", command = lambda: send_message(entry_field.get(), msg_list))
     button_back.pack()
     send_button.pack()
     root.protocol("WM_DELETE_WINDOW")
+
+def send_message(message, msg_list):
+    # request = requests.post('http://127.0.0.1:5000/message_list', json = {'login': login,
+    #                                                                                 'password': password,
+    #                                                                                 'message': message})
+    msg_list.insert(tkinter.END, f'{User_login} : {message}')
+
+
 
 def choise():
     clear()
@@ -99,6 +107,8 @@ def log(user_login, user_password):
     request = requests.post('http://127.0.0.1:5000/login', json = {'login': user_login,
                                                          'password': user_password})
     if request.content == b'Success':
+        User_login = user_login
+        password = user_password
         chat()
     elif request.content == b'Denied':
         messagebox.showinfo('Ошибка', 'войти так как не удалось найти совпадения')

@@ -38,7 +38,7 @@ def registration():
         my_cursor.execute(select_last_id)
         last_id = my_cursor.fetchone()
 
-        my_cursor.execute(check_login_for_registration, (responce['login'],)) # Не учитывается регистр в sql
+        my_cursor.execute(check_login_for_registration, (responce['login'],)) 
         login_coincidences = my_cursor.fetchall()
         if len(login_coincidences) != 0:
             return 'Denied' 
@@ -47,6 +47,16 @@ def registration():
             my_cursor.execute(insert_reg, user)
             my_db.commit()
         return 'Success'
+    else:
+        return "no request"
+
+@app.route('/message_list', methods = ['GET', 'POST'])
+def message_handler():
+    if request.method == 'POST':
+        responce = request.get_json()
+        #my_cursor.execute(check_login_password, (responce['login'], responce['password'],)) Запросы в бд
+        #user_coincidences = my_cursor.fetchall()
+
     else:
         return "no request"
 
