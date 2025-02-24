@@ -17,7 +17,6 @@ select_login = "SELECT login FROM users WHERE login = %s;"
 
 app = Flask("server")
 history = []
-test_reg = []
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
@@ -38,20 +37,17 @@ def registration():
         my_cursor.execute(select_last_id)
         last_id = my_cursor.fetchone()
 
-        my_cursor.execute(select_login, (responce['login'],))
+        my_cursor.execute(select_login, (responce['login'],)) # Не учитывается регистр в sql
         login_coincidences = my_cursor.fetchall()
         if len(login_coincidences) != 0:
-            return 'Denied'
+            return 'Denied' 
         else:
             user = (last_id[0] + 1, responce['login'],  responce['password'])
             my_cursor.execute(insert_reg, user)
             my_db.commit()
         return 'Success'
     else:
-        try:
-            return test_reg[-1]
-        except:
-            return "no request"
+        return "no request"
 
 if __name__ == '__main__':
     app.run(debug = True)

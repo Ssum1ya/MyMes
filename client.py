@@ -7,6 +7,9 @@ root = Tk()
 root.geometry('400x600')
 root.title('Войти в систему')
 
+login = None
+password = None
+
 def chat():
     clear()
     messages_frame = tkinter.Frame(root)
@@ -20,20 +23,28 @@ def chat():
     msg_list.pack()
     messages_frame.pack()
 
+    button_back = Button(text = 'Назад', command = choise)
+
     entry_field = tkinter.Entry(root, textvariable=my_msg)
     entry_field.bind("<Return>")
     entry_field.pack()
     send_button = tkinter.Button(root, text="отправить")
+    button_back.pack()
     send_button.pack()
     root.protocol("WM_DELETE_WINDOW")
 
-def reg(login, password):
-    request = requests.post('http://127.0.0.1:5000/registration', json = {'login': login,
-                                                                     'password': password})
-    if request.content == b'Success':
-        chat()
-    elif request.content == b'Denied':
-        pass
+def reg(user_login, password1, password2):
+    if password1 != password2:
+        messagebox.showinfo('Ошибка', 'Не удалось зарегестрироваться так как пароли не совпадают')
+        registration()
+    else:
+        request = requests.post('http://127.0.0.1:5000/registration', json = {'login': user_login,
+                                                                        'password': password1})
+        if request.content == b'Success':
+            login()
+        elif request.content == b'Denied':
+            messagebox.showinfo('Ошибка', 'Не удалось зарегестрироваться так как такой логин уже есть')
+            choise()
 
 def clear():
     for widget in root.winfo_children():
@@ -56,7 +67,7 @@ def registration():
     reg_password1 = Entry()
     title_password2 = Label(text = 'Еще раз пароль:')
     reg_password2 = Entry(show = '*')
-    button_regist = Button(text = 'Зарегистрироваться', command = lambda: reg(reg_login.get(), reg_password1.get()))
+    button_regist = Button(text = 'Зарегистрироваться', command = lambda: reg(reg_login.get(), reg_password1.get(), reg_password2.get()))
     main_title.pack()
     button_back.pack()
     log_title.pack()
