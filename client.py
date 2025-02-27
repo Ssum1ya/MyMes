@@ -41,7 +41,11 @@ def send_message(message, msg_list):
     #                                                                                 'message': message})
     msg_list.insert(tkinter.END, f'{login_password_array[0]} : {message}')
 
-
+def show_messages():
+    """
+    url for for each users chat. Threding function with get request to server.py
+    """
+    pass
 
 def choise():
     clear()
