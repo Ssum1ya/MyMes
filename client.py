@@ -7,9 +7,7 @@ root = Tk()
 root.geometry('400x600')
 root.title('Войти в систему')
 
-User_login = None
-password = None
-
+login_password_array = []
 def clear():
     for widget in root.winfo_children():
     	widget.destroy()
@@ -41,7 +39,7 @@ def send_message(message, msg_list):
     # request = requests.post('http://127.0.0.1:5000/message_list', json = {'login': login,
     #                                                                                 'password': password,
     #                                                                                 'message': message})
-    msg_list.insert(tkinter.END, f'{User_login} : {message}')
+    msg_list.insert(tkinter.END, f'{login_password_array[0]} : {message}')
 
 
 
@@ -107,8 +105,8 @@ def log(user_login, user_password):
     request = requests.post('http://127.0.0.1:5000/login', json = {'login': user_login,
                                                          'password': user_password})
     if request.content == b'Success':
-        User_login = user_login
-        password = user_password
+        login_password_array.append(user_login)
+        login_password_array.append(user_password)
         chat()
     elif request.content == b'Denied':
         messagebox.showinfo('Ошибка', 'войти так как не удалось найти совпадения')
