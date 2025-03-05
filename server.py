@@ -50,15 +50,33 @@ def registration():
     else:
         return "no request"
 
-@app.route('/message_list', methods = ['GET', 'POST'])
-def message_handler():
+@app.route('/users', methods = ['GET', 'POST'])
+def get_users():
     if request.method == 'POST':
-        responce = request.get_json()
-        #my_cursor.execute(check_login_password, (responce['login'], responce['password'],)) Запросы в бд
-        #user_coincidences = my_cursor.fetchall()
-
+        pass
     else:
-        return "no request"
+        pass
+
+@app.route('/get_new_messages', methods = ['GET', 'POST'])
+def get_new_messages():
+    if request.method == 'POST':
+        pass
+    else:
+        pass
+
+@app.route('/get_history', methods = ['GET', 'POST'])
+def get_history():
+    if request.method == 'POST':
+        pass
+    else:
+        pass
+
+@app.route('/send_message', methods = ['GET', 'POST'])
+def send_message():
+    if request.method == 'POST':
+        pass
+    else:
+        pass
 
 if __name__ == '__main__':
     app.run(debug = True)
