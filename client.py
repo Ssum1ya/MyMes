@@ -7,10 +7,41 @@ root = Tk()
 root.geometry('400x600')
 root.title('Войти в систему')
 
-login_password_array = []
+login_password_id__array = []
 def clear():
     for widget in root.winfo_children():
     	widget.destroy()
+
+def main_menu():
+    clear()
+    main_title = Label(text = 'Главное Меню')
+    button_back = Button(text = 'Назад', command = choise)
+    button_chats = Button(text = 'Мои чаты')
+    button_add2chats = Button(text = 'добавить человека в чат', command = lambda: add_person2chats())
+    main_title.pack()
+    button_add2chats.pack()
+    button_chats.pack()
+    button_back.pack()
+
+def add_person2chats():
+    clear()
+    main_title = Label(text = 'Введите логин того кого хотите добавить в чаты')
+    person_login = Entry()
+    button_check = Button(text = 'Добавить', command = lambda : check_login_in_bd(person_login.get(), ))
+    button_back = Button(text = 'Назад', command = main_menu)
+    main_title.pack()
+    person_login.pack()
+    button_check.pack()
+    button_back.pack()
+
+def check_login_in_bd(user_login):
+    request = requests.post('http://127.0.0.1:5000/add_person2chats', json = {'login': user_login})
+    if request.content == b'Success':
+        messagebox.showinfo('Успех', 'пользователь успешно добавлен в ваши чаты')
+        main_menu()
+    elif request.content == b'Denied':
+        messagebox.showinfo('Ошибка', 'не удалось найти пользователя с логином')
+        add_person2chats()
 
 def chat():
     clear()
@@ -39,7 +70,7 @@ def send_message(message, msg_list):
     # request = requests.post('http://127.0.0.1:5000/message_list', json = {'login': login,
     #                                                                                 'password': password,
     #                                                                                 'message': message})
-    msg_list.insert(tkinter.END, f'{login_password_array[0]} : {message}')
+    msg_list.insert(tkinter.END, f'{login_password_id__array[0]} : {message}')
 
 def show_messages():
     """
@@ -109,9 +140,9 @@ def log(user_login, user_password):
     request = requests.post('http://127.0.0.1:5000/login', json = {'login': user_login,
                                                          'password': user_password})
     if request.content == b'Success':
-        login_password_array.append(user_login)
-        login_password_array.append(user_password)
-        chat()
+        login_password_id__array.append(user_login)
+        login_password_id__array.append(user_password)
+        main_menu()
     elif request.content == b'Denied':
         messagebox.showinfo('Ошибка', 'войти так как не удалось найти совпадения')
         login()

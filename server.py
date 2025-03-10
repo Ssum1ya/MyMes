@@ -50,6 +50,20 @@ def registration():
     else:
         return "no request"
 
+@app.route('/add_person2chats', methods = ['GET', 'POST'])
+def add_perwon2chats():
+    if request.method == 'POST':
+        responce = request.get_json()
+        my_cursor.execute(check_login_for_registration, (responce['login'],)) 
+        login_coincidences = my_cursor.fetchall()
+        if len(login_coincidences) != 0:
+             pass # Добавление в бд
+        else:
+            return 'Denied'
+        return 'Success'
+    else:
+        pass
+
 @app.route('/users', methods = ['GET', 'POST'])
 def get_users():
     if request.method == 'POST':
