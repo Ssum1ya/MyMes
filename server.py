@@ -16,6 +16,7 @@ insert_chat = "INSERT INTO chats (login, chat) VALUES (%s, %s)"
 select_last_id =  "SELECT id FROM users ORDER BY id DESC LIMIT 1"
 check_login_for_registration = "SELECT login FROM users WHERE login = %s;"
 check_login_password = "SELECT login, password FROM users WHERE login = %s AND password = %s;"
+select_chats = "SELECT chat FROM chats WHERE login = %s;"
 
 app = Flask("server")
 
@@ -75,7 +76,14 @@ def add_perwon2chats():
 @app.route('/users', methods = ['GET', 'POST'])
 def get_users():
     if request.method == 'POST':
-        pass
+        responce = request.get_json()
+        my_cursor.execute(select_chats, (responce['login'],))
+        chats = my_cursor.fetchall()
+        chats_array = []
+        for i in range(len(chats)):
+            chats_array.append(chats[i][0])
+        print(chats_array)
+        return chats_array
     else:
         pass
 

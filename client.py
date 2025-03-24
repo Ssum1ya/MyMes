@@ -16,12 +16,25 @@ def main_menu():
     clear()
     main_title = Label(text = 'Главное Меню')
     button_back = Button(text = 'Назад', command = choise)
-    button_chats = Button(text = 'Мои чаты')
+    button_chats = Button(text = 'Мои чаты', command = lambda: show_my_chats())
     button_add2chats = Button(text = 'добавить человека в чат', command = lambda: add_person2chats())
     main_title.pack()
     button_add2chats.pack()
     button_chats.pack()
     button_back.pack()
+
+def show_my_chats():
+    clear()
+    request = requests.post('http://127.0.0.1:5000/users', json = {'login': login_password_id__array[0]})
+    chats = request.content.decode()
+    print(type(chats))
+    chats_array = chats[1:-2].split(',')
+    for i in range(len(chats_array)):
+        chat_button = Button(text = chats_array[i], command = lambda : chat())
+        chat_button.pack()
+    button_back = Button(text = 'Назад', command = main_menu)
+    button_back.pack()
+
 
 def add_person2chats():
     clear()
@@ -60,7 +73,7 @@ def chat():
     msg_list.pack()
     messages_frame.pack()
 
-    button_back = Button(text = 'Назад', command = choise)
+    button_back = Button(text = 'Назад', command = main_menu)
 
     entry_field = tkinter.Entry(root, textvariable=my_msg)
     entry_field.bind("<Return>")
