@@ -12,6 +12,7 @@ my_db = mysql.connector.connect(
 )
 my_cursor = my_db.cursor()
 insert_reg = "INSERT INTO users (id, login, password) VALUES (%s, %s, %s)"
+insert_chat = "INSERT INTO chats (login, chat) VALUES (%s, %s)"
 select_last_id =  "SELECT id FROM users ORDER BY id DESC LIMIT 1"
 check_login_for_registration = "SELECT login FROM users WHERE login = %s;"
 check_login_password = "SELECT login, password FROM users WHERE login = %s AND password = %s;"
@@ -44,7 +45,10 @@ def registration():
             return 'Denied' 
         else:
             user = (last_id[0] + 1, responce['login'],  responce['password'])
-            my_cursor.execute(insert_reg, user)
+            try:
+                my_cursor.execute(insert_reg, user)
+            except:
+                return 'Denied long login'
             my_db.commit()
         return 'Success'
     else:
@@ -56,8 +60,12 @@ def add_perwon2chats():
         responce = request.get_json()
         my_cursor.execute(check_login_for_registration, (responce['login'],)) 
         login_coincidences = my_cursor.fetchall()
-        if len(login_coincidences) != 0:
-             pass # Добавление в бд
+        if responce['login'] == responce['chat']:
+            return 'Denied login equals chat'
+        elif len(login_coincidences) != 0:
+             insert_data = (responce['login'],  responce['chat'])
+             my_cursor.execute(insert_chat, insert_data)
+             my_db.commit()
         else:
             return 'Denied'
         return 'Success'

@@ -35,12 +35,16 @@ def add_person2chats():
     button_back.pack()
 
 def check_login_in_bd(user_login):
-    request = requests.post('http://127.0.0.1:5000/add_person2chats', json = {'login': user_login})
+    request = requests.post('http://127.0.0.1:5000/add_person2chats', json = {'chat': user_login,
+                                                                              'login': login_password_id__array[0]})
     if request.content == b'Success':
         messagebox.showinfo('Успех', 'пользователь успешно добавлен в ваши чаты')
         main_menu()
     elif request.content == b'Denied':
         messagebox.showinfo('Ошибка', 'не удалось найти пользователя с логином')
+        add_person2chats()
+    elif request.content == b'Denied login equals chat':
+        messagebox.showinfo('Ошибка', 'ваш логин равен чату который хотите добавить')
         add_person2chats()
 
 def chat():
@@ -117,6 +121,9 @@ def reg(user_login, password1, password2):
             login()
         elif request.content == b'Denied':
             messagebox.showinfo('Ошибка', 'Не удалось зарегестрироваться так как такой логин уже есть')
+            choise()
+        elif request.content == b'Denied long login':
+            messagebox.showinfo('Ошибка', 'Не удалось зарегестрироваться так как логин слишком длинный')
             choise()
     
 def login():
