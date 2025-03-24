@@ -1,6 +1,6 @@
 import database_config as cfg
 
-from flask import Flask, url_for, request
+from flask import Flask, request
 import mysql.connector
 
 my_db = mysql.connector.connect(
@@ -17,6 +17,8 @@ select_last_id =  "SELECT id FROM users ORDER BY id DESC LIMIT 1"
 check_login_for_registration = "SELECT login FROM users WHERE login = %s;"
 check_login_password = "SELECT login, password FROM users WHERE login = %s AND password = %s;"
 select_chats = "SELECT chat FROM chats WHERE login = %s;"
+select_message_lastId =  "SELECT messageId FROM messages ORDER BY messageId DESC LIMIT 1"
+insert_message = "INSERT INTO messages (messageId, login1, login2, text) VALUES (%s, %s, %s, %s)"
 
 app = Flask("server")
 
@@ -37,6 +39,7 @@ def login():
 def registration():
     if request.method == 'POST':
         responce = request.get_json()
+
         my_cursor.execute(select_last_id)
         last_id = my_cursor.fetchone()
 
@@ -59,6 +62,7 @@ def registration():
 def add_perwon2chats():
     if request.method == 'POST':
         responce = request.get_json()
+
         my_cursor.execute(check_login_for_registration, (responce['login'],)) 
         login_coincidences = my_cursor.fetchall()
         if responce['login'] == responce['chat']:
@@ -77,12 +81,12 @@ def add_perwon2chats():
 def get_users():
     if request.method == 'POST':
         responce = request.get_json()
+        
         my_cursor.execute(select_chats, (responce['login'],))
         chats = my_cursor.fetchall()
         chats_array = []
         for i in range(len(chats)):
             chats_array.append(chats[i][0])
-        print(chats_array)
         return chats_array
     else:
         pass
@@ -104,7 +108,15 @@ def get_history():
 @app.route('/send_message', methods = ['GET', 'POST'])
 def send_message():
     if request.method == 'POST':
-        pass
+        responce = request.get_json()
+
+        my_cursor.execute(select_message_lastId)
+        last_id = my_cursor.fetchone()
+
+        message = (last_id[0] + 1, responce['login1'],  responce['login2'], responce['text'])
+        my_cursor.execute(insert_message, message)
+        my_db.commit()
+        return 'Success'
     else:
         pass
 

@@ -8,6 +8,7 @@ root.geometry('400x600')
 root.title('Войти в систему')
 
 login_password_id__array = []
+
 def clear():
     for widget in root.winfo_children():
     	widget.destroy()
@@ -27,14 +28,12 @@ def show_my_chats():
     clear()
     request = requests.post('http://127.0.0.1:5000/users', json = {'login': login_password_id__array[0]})
     chats = request.content.decode()
-    print(type(chats))
     chats_array = chats[1:-2].split(',')
     for i in range(len(chats_array)):
-        chat_button = Button(text = chats_array[i], command = lambda : chat())
+        chat_button = Button(text = chats_array[i], command = lambda : chat(chats_array[i]))
         chat_button.pack()
     button_back = Button(text = 'Назад', command = main_menu)
     button_back.pack()
-
 
 def add_person2chats():
     clear()
@@ -60,7 +59,7 @@ def check_login_in_bd(user_login):
         messagebox.showinfo('Ошибка', 'ваш логин равен чату который хотите добавить')
         add_person2chats()
 
-def chat():
+def chat(user_chat):
     clear()
     messages_frame = tkinter.Frame(root)
     my_msg = tkinter.StringVar()
@@ -78,15 +77,15 @@ def chat():
     entry_field = tkinter.Entry(root, textvariable=my_msg)
     entry_field.bind("<Return>")
     entry_field.pack()
-    send_button = tkinter.Button(root, text="отправить", command = lambda: send_message(entry_field.get(), msg_list))
+    send_button = tkinter.Button(root, text="отправить", command = lambda: send_message(entry_field.get(), msg_list, user_chat))
     button_back.pack()
     send_button.pack()
     root.protocol("WM_DELETE_WINDOW")
 
-def send_message(message, msg_list):
-    # request = requests.post('http://127.0.0.1:5000/message_list', json = {'login': login,
-    #                                                                                 'password': password,
-    #                                                                                 'message': message})
+def send_message(message, msg_list, user_chat):
+    request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
+                                                                                     'login2': user_chat,
+                                                                                     'text': message})
     msg_list.insert(tkinter.END, f'{login_password_id__array[0]} : {message}')
 
 def show_messages():
