@@ -75,7 +75,7 @@ def add_perwon2chats():
             return 'Denied'
         return 'Success'
     else:
-        pass
+        return "no request"
 
 @app.route('/users', methods = ['GET', 'POST'])
 def get_users():
@@ -89,7 +89,7 @@ def get_users():
             chats_array.append(chats[i][0])
         return chats_array
     else:
-        pass
+        return "no request"
 
 @app.route('/get_new_messages', methods = ['GET', 'POST'])
 def get_new_messages():
@@ -118,7 +118,7 @@ def send_message():
         my_db.commit()
         return 'Success'
     else:
-        pass
+        return "no request"
 
 if __name__ == '__main__':
     app.run(debug = True)
