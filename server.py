@@ -19,6 +19,7 @@ check_login_password = "SELECT login, password FROM users WHERE login = %s AND p
 select_chats = "SELECT chat FROM chats WHERE login = %s;"
 select_message_lastId =  "SELECT messageId FROM messages ORDER BY messageId DESC LIMIT 1"
 insert_message = "INSERT INTO messages (messageId, login1, login2, text) VALUES (%s, %s, %s, %s)"
+select_history = "SELECT text FROM messages WHERE login1 = %s OR login1 = %s AND login2 = %s OR login2 = %s ORDER BY messageId ASC"
 
 app = Flask("server")
 
@@ -103,9 +104,16 @@ def get_new_messages():
 @app.route('/get_history', methods = ['GET', 'POST'])
 def get_history():
     if request.method == 'POST':
-        pass
+        responce = request.get_json()
+
+        my_cursor.execute(select_history, (responce['login1'], responce['login2'], responce['login1'], responce['login2'],))
+        messages = my_cursor.fetchall()
+        messages_array = []
+        for i in range(len(messages)):
+            messages_array.append(messages[i][0])
+        return messages_array
     else:
-        pass
+        return "no request"
 
 @app.route('/send_message', methods = ['GET', 'POST'])
 def send_message():
@@ -114,7 +122,6 @@ def send_message():
 
         my_cursor.execute(select_message_lastId)
         last_id = my_cursor.fetchone()
-
         message = (last_id[0] + 1, responce['login1'],  responce['login2'], responce['text'])
         my_cursor.execute(insert_message, message)
         my_db.commit()

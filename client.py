@@ -30,7 +30,11 @@ def show_my_chats():
     chats = request.content.decode()
     chats_array = chats[1:-2].split(',')
     for i in range(len(chats_array)):
-        chat_button = Button(text = chats_array[i], command = lambda : chat(chats_array[i]))
+        if i == len(chats_array) - 1:
+            users_chat = chats_array[i][4 : -2]
+        else:
+            users_chat = chats_array[i][4 : -1]
+        chat_button = Button(text = users_chat, command = lambda: chat(users_chat))
         chat_button.pack()
     button_back = Button(text = 'Назад', command = main_menu)
     button_back.pack()
@@ -60,7 +64,13 @@ def check_login_in_bd(user_login):
         add_person2chats()
 
 def chat(user_chat):
+    print(user_chat)
     clear()
+    request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
+                                                                                     'login2': user_chat})
+    messages = request.content.decode()
+    messages_array = messages[1:-2].split(',')
+
     messages_frame = tkinter.Frame(root)
     my_msg = tkinter.StringVar()
     my_msg.set("Введите ваше сообщение здесь.")
@@ -77,10 +87,18 @@ def chat(user_chat):
     entry_field = tkinter.Entry(root, textvariable=my_msg)
     entry_field.bind("<Return>")
     entry_field.pack()
+
     send_button = tkinter.Button(root, text="отправить", command = lambda: send_message(entry_field.get(), msg_list, user_chat))
     button_back.pack()
     send_button.pack()
     root.protocol("WM_DELETE_WINDOW")
+
+    for i in range(len(messages_array)):
+        if i == len(messages_array) - 1:
+            message = messages_array[i].encode('utf-8').decode('unicode_escape')[4 : -2]
+        else:
+            message = messages_array[i].encode('utf-8').decode('unicode_escape')[4 : -1]
+        msg_list.insert(tkinter.END, f'{login_password_id__array[0]} : {message}')
 
 def send_message(message, msg_list, user_chat):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
