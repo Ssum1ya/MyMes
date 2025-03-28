@@ -159,6 +159,9 @@ def log(user_login, user_password):
     request = requests.post('http://127.0.0.1:5000/login', json = {'login': user_login,
                                                          'password': user_password})
     if request.content == b'Success':
+        if len(login_password_id__array) >= 2:
+            for i in range(len(login_password_id__array)):
+                login_password_id__array.pop(0)
         login_password_id__array.append(user_login)
         login_password_id__array.append(user_password)
         main_menu()
