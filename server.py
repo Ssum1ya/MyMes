@@ -70,6 +70,8 @@ def add_perwon2chats():
         elif len(login_coincidences) != 0:
              insert_data = (responce['login'],  responce['chat'])
              my_cursor.execute(insert_chat, insert_data)
+             insert_data = (responce['chat'],  responce['login'])
+             my_cursor.execute(insert_chat, insert_data)
              my_db.commit()
         else:
             return 'Denied'
