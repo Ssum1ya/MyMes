@@ -76,8 +76,21 @@ def chat(user_chat):
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat})
     messages = request.content.decode()
-    messages_array = messages[1:-2].split(',')
+    messages_array = messages[1: -2].split(',')
+    lenght = len(messages_array)
 
+    message_mas = []
+    login1_mas = []
+
+    for i in range(0, lenght, 2):
+        login1_mas.append(messages_array[i][10: -1])
+
+    for i in range(1, lenght, 2):
+        if i == lenght - 1:
+            message_mas.append(messages_array[i][6 : -6].encode('utf-8').decode('unicode_escape'))
+        else:
+            message_mas.append(messages_array[i][6 : -5].encode('utf-8').decode('unicode_escape'))
+        
     messages_frame = tkinter.Frame(root)
     my_msg = tkinter.StringVar()
     my_msg.set("Введите ваше сообщение здесь.")
@@ -100,12 +113,10 @@ def chat(user_chat):
     send_button.pack()
     root.protocol("WM_DELETE_WINDOW")
 
-    for i in range(len(messages_array)):
-        if i == len(messages_array) - 1:
-            message = messages_array[i].encode('utf-8').decode('unicode_escape')[4 : -2]
-        else:
-            message = messages_array[i].encode('utf-8').decode('unicode_escape')[4 : -1]
-        msg_list.insert(tkinter.END, f'{login_password_id__array[0]} : {message}')
+    for i in range(len(message_mas)):
+        login1 = login1_mas[i]
+        message = message_mas[i]
+        msg_list.insert(tkinter.END, f'{login1} : {message}')
 
 def send_message(message, msg_list, user_chat):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
