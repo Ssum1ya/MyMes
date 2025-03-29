@@ -77,11 +77,13 @@ def chat(user_chat):
                                                                                      'login2': user_chat})
     messages = request.content.decode()
     messages_array = messages[1: -2].split(',')
-    for i in range(len(messages_array)):
+    lenght = len(messages_array)
+    for i in range(0, lenght, 2):
         print(messages_array[i][10: -1])
-    # for i in range(len(messages_array)):
-    #     print(messages_array[i][4:])
-    #     print("ZZZ")
+
+    for i in range(1, lenght, 2):
+        print(messages_array[i][6 : -5].encode('utf-8').decode('unicode_escape'))
+        
     messages_frame = tkinter.Frame(root)
     my_msg = tkinter.StringVar()
     my_msg.set("Введите ваше сообщение здесь.")
