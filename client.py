@@ -26,6 +26,8 @@ def main_menu():
 
 def show_my_chats():
     clear()
+    main_title = Label(text = 'Ваш список чатов')
+    main_title.pack()
     request = requests.post('http://127.0.0.1:5000/users', json = {'login': login_password_id__array[0]})
     chats = request.content.decode()
     chats_array = chats[1:-2].split(',')
@@ -34,9 +36,14 @@ def show_my_chats():
             users_chat = chats_array[i][4 : -2]
         else:
             users_chat = chats_array[i][4 : -1]
-        chat_button = Button(text = users_chat, command = lambda: chat(users_chat))
-        chat_button.pack()
-    chat_button.pack()
+        chat_title = Label(text = users_chat)
+        chat_title.pack()
+    select_title = Label(text = 'Напишите чат который хоите выбрать')
+    select_title.pack()
+    select_chat = Entry()
+    select_chat_button = Button(text = 'Выбрать чат', command = lambda : chat(select_chat.get()))
+    select_chat.pack()
+    select_chat_button.pack()
     button_back = Button(text = 'Назад', command = main_menu)
     button_back.pack()
 
