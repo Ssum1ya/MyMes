@@ -72,7 +72,6 @@ def check_login_in_bd(user_login):
         add_person2chats()
 
 def chat(user_chat):
-    print(user_chat)
     clear()
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat})
