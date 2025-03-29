@@ -36,6 +36,7 @@ def show_my_chats():
             users_chat = chats_array[i][4 : -1]
         chat_button = Button(text = users_chat, command = lambda: chat(users_chat))
         chat_button.pack()
+    chat_button.pack()
     button_back = Button(text = 'Назад', command = main_menu)
     button_back.pack()
 
