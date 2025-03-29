@@ -19,7 +19,7 @@ check_login_password = "SELECT login, password FROM users WHERE login = %s AND p
 select_chats = "SELECT chat FROM chats WHERE login = %s;"
 select_message_lastId =  "SELECT messageId FROM messages ORDER BY messageId DESC LIMIT 1"
 insert_message = "INSERT INTO messages (messageId, login1, login2, text) VALUES (%s, %s, %s, %s)"
-select_history = "SELECT text FROM messages WHERE login1 = %s OR login1 = %s AND login2 = %s OR login2 = %s ORDER BY messageId ASC"
+select_history = "SELECT login1, text FROM messages WHERE (login1 = %s AND login2 = %s) OR (login1 = %s AND login2 = %s) ORDER BY messageId ASC"
 
 app = Flask("server")
 
@@ -106,11 +106,15 @@ def get_history():
     if request.method == 'POST':
         responce = request.get_json()
 
-        my_cursor.execute(select_history, (responce['login1'], responce['login2'], responce['login1'], responce['login2'],))
+        my_cursor.execute(select_history, (responce['login1'], responce['login2'], responce['login2'], responce['login1'],))
         messages = my_cursor.fetchall()
         messages_array = []
         for i in range(len(messages)):
-            messages_array.append(messages[i][0])
+            tmp_array = []
+            tmp_array.append(messages[i][0])
+            tmp_array.append(messages[i][1])
+            messages_array.append(tmp_array)
+        print(messages_array)
         return messages_array
     else:
         return "no request"
