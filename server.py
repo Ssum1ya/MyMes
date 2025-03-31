@@ -1,7 +1,7 @@
-import database_config as cfg
-
 from flask import Flask, request
 import mysql.connector
+
+import database_config as cfg
 
 my_db = mysql.connector.connect(
     host = cfg.host,
