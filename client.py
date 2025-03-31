@@ -2,6 +2,8 @@ import tkinter
 from tkinter import *
 from tkinter import messagebox
 import requests
+import threading
+from time import sleep
 
 root = Tk()
 root.geometry('400x600')
@@ -73,23 +75,7 @@ def check_login_in_bd(user_login):
 
 def chat(user_chat):
     clear()
-    request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
-                                                                                     'login2': user_chat})
-    messages = request.content.decode()
-    messages_array = messages[1: -2].split(',')
-    lenght = len(messages_array)
-
-    message_mas = []
-    login1_mas = []
-
-    for i in range(0, lenght, 2):
-        login1_mas.append(messages_array[i][10: -1])
-
-    for i in range(1, lenght, 2):
-        if i == lenght - 1:
-            message_mas.append(messages_array[i][6 : -6].encode('utf-8').decode('unicode_escape'))
-        else:
-            message_mas.append(messages_array[i][6 : -5].encode('utf-8').decode('unicode_escape'))
+    login1_mas, message_mas = show_history_messages(user_chat)
         
     messages_frame = tkinter.Frame(root)
     my_msg = tkinter.StringVar()
@@ -117,6 +103,23 @@ def chat(user_chat):
         login1 = login1_mas[i]
         message = message_mas[i]
         msg_list.insert(tkinter.END, f'{login1} : {message}')
+    
+    loading_history_thread = threading.Thread(target = lambda: load_hitory_in_runtime(msg_list, user_chat))
+    loading_history_thread.start()
+
+def load_hitory_in_runtime(msg_list, user_chat):
+        while True:
+            sleep(5)
+            # for i in reversed(msg_list.curselection()):
+            #     msg_list.delete(i)
+            msg_list.delete(0, msg_list.size())
+            
+            login1_mas, message_mas = show_history_messages(user_chat)
+            for i in range(len(message_mas)):
+                login1 = login1_mas[i]
+                message = message_mas[i]
+                msg_list.insert(tkinter.END, f'{login1} : {message}')
+
 
 def send_message(message, msg_list, user_chat):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
