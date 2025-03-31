@@ -124,11 +124,26 @@ def send_message(message, msg_list, user_chat):
                                                                                      'text': message})
     msg_list.insert(tkinter.END, f'{login_password_id__array[0]} : {message}')
 
-def show_messages():
-    """
-    url for for each users chat. Threding function with get request to server.py
-    """
-    pass
+def show_history_messages(user_chat):
+    request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
+                                                                                     'login2': user_chat})
+    messages = request.content.decode()
+    messages_array = messages[1: -2].split(',')
+    lenght = len(messages_array)
+
+    message_mas = []
+    login1_mas = []
+
+    for i in range(0, lenght, 2):
+        login1_mas.append(messages_array[i][10: -1])
+
+    for i in range(1, lenght, 2):
+        if i == lenght - 1:
+            message_mas.append(messages_array[i][6 : -6].encode('utf-8').decode('unicode_escape'))
+        else:
+            message_mas.append(messages_array[i][6 : -5].encode('utf-8').decode('unicode_escape'))
+    
+    return login1_mas, message_mas
 
 def choise():
     clear()
