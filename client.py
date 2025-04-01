@@ -110,7 +110,10 @@ def chat(user_chat):
 def load_hitory_in_runtime(msg_list, user_chat):
         while True:
             sleep(5)
-            msg_list.delete(0, msg_list.size())
+            try:
+                msg_list.delete(0, msg_list.size())
+            except:
+                break
             
             login1_mas, message_mas = show_history_messages(user_chat)
             for i in range(len(message_mas)):
