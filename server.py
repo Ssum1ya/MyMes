@@ -4,22 +4,22 @@ import mysql.connector
 import database_config as cfg
 
 my_db = mysql.connector.connect(
-    host = cfg.host,
-    user = cfg.user,
-    auth_plugin = cfg.auth_plugin,
-    passwd = cfg.passwd,
-    database = cfg.database
+    host = cfg.HOST,
+    user = cfg.USER,
+    auth_plugin = cfg.AUTH_PLAGIN,
+    passwd = cfg.PASSWORD,
+    database = cfg.DATABASE
 )
 my_cursor = my_db.cursor()
-insert_reg = "INSERT INTO users (id, login, password) VALUES (%s, %s, %s)"
-insert_chat = "INSERT INTO chats (login, chat) VALUES (%s, %s)"
-select_last_id =  "SELECT id FROM users ORDER BY id DESC LIMIT 1"
-check_login_for_registration = "SELECT login FROM users WHERE login = %s;"
-check_login_password = "SELECT login, password FROM users WHERE login = %s AND password = %s;"
-select_chats = "SELECT chat FROM chats WHERE login = %s;"
-select_message_lastId =  "SELECT messageId FROM messages ORDER BY messageId DESC LIMIT 1"
-insert_message = "INSERT INTO messages (messageId, login1, login2, text) VALUES (%s, %s, %s, %s)"
-select_history = "SELECT login1, text FROM messages WHERE (login1 = %s AND login2 = %s) OR (login1 = %s AND login2 = %s) ORDER BY messageId ASC"
+insert_reg = 'INSERT INTO users (id, login, password) VALUES (%s, %s, %s)'
+insert_chat = 'INSERT INTO chats (login, chat) VALUES (%s, %s)'
+select_last_id =  'SELECT id FROM users ORDER BY id DESC LIMIT 1'
+check_login_for_registration = 'SELECT login FROM users WHERE login = %s;'
+check_login_password = 'SELECT login, password FROM users WHERE login = %s AND password = %s;'
+select_chats = 'SELECT chat FROM chats WHERE login = %s;'
+select_message_lastId =  'SELECT messageId FROM messages ORDER BY messageId DESC LIMIT 1'
+insert_message = 'INSERT INTO messages (messageId, login1, login2, text) VALUES (%s, %s, %s, %s)'
+select_history = 'SELECT login1, text FROM messages WHERE (login1 = %s AND login2 = %s) OR (login1 = %s AND login2 = %s) ORDER BY messageId ASC'
 
 app = Flask("server")
 
@@ -34,7 +34,7 @@ def login():
         else:  
             return 'Success'
     else:
-        return "no request"
+        return 'no request'
 
 @app.route('/registration', methods = ['GET', 'POST'])
 def registration():
@@ -57,7 +57,7 @@ def registration():
             my_db.commit()
         return 'Success'
     else:
-        return "no request"
+        return 'no request'
 
 @app.route('/add_person2chats', methods = ['GET', 'POST'])
 def add_perwon2chats():
@@ -78,7 +78,7 @@ def add_perwon2chats():
             return 'Denied'
         return 'Success'
     else:
-        return "no request"
+        return 'no request'
 
 @app.route('/users', methods = ['GET', 'POST'])
 def get_users():
@@ -92,7 +92,7 @@ def get_users():
             chats_array.append(chats[i][0])
         return chats_array
     else:
-        return "no request"
+        return 'no request'
 
 @app.route('/get_new_messages', methods = ['GET', 'POST'])
 def get_new_messages():
@@ -114,10 +114,9 @@ def get_history():
             tmp_array.append(messages[i][0])
             tmp_array.append(messages[i][1])
             messages_array.append(tmp_array)
-        print(messages_array)
         return messages_array
     else:
-        return "no request"
+        return 'no request'
 
 @app.route('/send_message', methods = ['GET', 'POST'])
 def send_message():
@@ -131,7 +130,7 @@ def send_message():
         my_db.commit()
         return 'Success'
     else:
-        return "no request"
+        return 'no request'
 
 if __name__ == '__main__':
     app.run(debug = True)

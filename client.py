@@ -1,8 +1,8 @@
-import tkinter
-from tkinter import *
+from tkinter import Tk, Label, Button, Entry, Listbox, Frame, StringVar, Scrollbar
+from tkinter import RIGHT, LEFT, BOTH, Y, END
 from tkinter import messagebox
 import requests
-import threading
+from threading import Thread
 from time import sleep
 
 root = Tk()
@@ -77,24 +77,24 @@ def chat(user_chat):
     clear()
     login1_mas, message_mas = show_history_messages(user_chat)
         
-    messages_frame = tkinter.Frame(root)
-    my_msg = tkinter.StringVar()
-    my_msg.set("Введите ваше сообщение здесь.")
-    scrollbar = tkinter.Scrollbar(messages_frame)
+    messages_frame = Frame(root)
+    my_msg = StringVar()
+    my_msg.set('Введите ваше сообщение здесь.')
+    scrollbar = Scrollbar(messages_frame)
 
-    msg_list = tkinter.Listbox(messages_frame, height=15, width=50, yscrollcommand=scrollbar.set)
-    scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
-    msg_list.pack(side=tkinter.LEFT, fill=tkinter.BOTH)
+    msg_list = Listbox(messages_frame, height = 15, width = 50, yscrollcommand = scrollbar.set)
+    scrollbar.pack(side = RIGHT, fill = Y)
+    msg_list.pack(side = LEFT, fill = BOTH)
     msg_list.pack()
     messages_frame.pack()
 
     button_back = Button(text = 'Назад', command = main_menu)
 
-    entry_field = tkinter.Entry(root, textvariable=my_msg)
-    entry_field.bind("<Return>")
+    entry_field = Entry(root, textvariable = my_msg)
+    entry_field.bind('<Return>')
     entry_field.pack()
 
-    send_button = tkinter.Button(root, text="отправить", command = lambda: send_message(entry_field.get(), msg_list, user_chat))
+    send_button = Button(root, text = 'отправить', command = lambda: send_message(entry_field.get(), msg_list, user_chat))
     button_back.pack()
     send_button.pack()
     root.protocol("WM_DELETE_WINDOW")
@@ -102,30 +102,28 @@ def chat(user_chat):
     for i in range(len(message_mas)):
         login1 = login1_mas[i]
         message = message_mas[i]
-        msg_list.insert(tkinter.END, f'{login1} : {message}')
+        msg_list.insert(END, f'{login1} : {message}')
     
-    loading_history_thread = threading.Thread(target = lambda: load_hitory_in_runtime(msg_list, user_chat))
+    loading_history_thread = Thread(target = lambda: load_hitory_in_runtime(msg_list, user_chat))
     loading_history_thread.start()
 
 def load_hitory_in_runtime(msg_list, user_chat):
         while True:
             sleep(5)
-            # for i in reversed(msg_list.curselection()):
-            #     msg_list.delete(i)
             msg_list.delete(0, msg_list.size())
             
             login1_mas, message_mas = show_history_messages(user_chat)
             for i in range(len(message_mas)):
                 login1 = login1_mas[i]
                 message = message_mas[i]
-                msg_list.insert(tkinter.END, f'{login1} : {message}')
+                msg_list.insert(END, f'{login1} : {message}')
 
 
 def send_message(message, msg_list, user_chat):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat,
                                                                                      'text': message})
-    msg_list.insert(tkinter.END, f'{login_password_id__array[0]} : {message}')
+    msg_list.insert(END, f'{login_password_id__array[0]} : {message}')
 
 def show_history_messages(user_chat):
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
