@@ -64,7 +64,18 @@ def add_perwon2chats():
     if request.method == 'POST':
         responce = request.get_json()
 
-        my_cursor.execute(check_login_for_registration, (responce['login'],)) 
+        if responce['chat'] == '':
+            return 'Denied empty string'
+        
+        my_cursor.execute(select_chats, (responce['login'],))
+        chats = my_cursor.fetchall()
+        chats_array = []
+        for i in range(len(chats)):
+            chats_array.append(chats[i][0])
+        if responce['chat'] in chats_array:
+            return 'Denied already in chats'
+
+        my_cursor.execute(check_login_for_registration, (responce['chat'],)) 
         login_coincidences = my_cursor.fetchall()
         if responce['login'] == responce['chat']:
             return 'Denied login equals chat'
