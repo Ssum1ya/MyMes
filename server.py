@@ -21,6 +21,7 @@ select_message_lastId =  'SELECT messageId FROM messages ORDER BY messageId DESC
 insert_message = 'INSERT INTO messages (messageId, login1, login2, text) VALUES (%s, %s, %s, %s)'
 select_history = 'SELECT login1, text FROM messages WHERE (login1 = %s AND login2 = %s) OR (login1 = %s AND login2 = %s) ORDER BY messageId ASC'
 insert_new_message = 'INSERT INTO new_messages (id, login1, login2) VALUES (%s, %s, %s)'
+delete_new_message = 'DELETE FROM new_messages WHERE login1 = %s AND login2 = %s;' # SET SQL_SAFE_UPDATES = 0;
 
 app = Flask("server")
 
@@ -117,6 +118,10 @@ def get_new_messages():
 def get_history():
     if request.method == 'POST':
         responce = request.get_json()
+        
+        print(responce['login1'], responce['login2'])
+        my_cursor.execute(delete_new_message, (responce['login2'], responce['login1'])) # multi = True
+        my_db.commit()
 
         my_cursor.execute(select_history, (responce['login1'], responce['login2'], responce['login2'], responce['login1'],))
         messages = my_cursor.fetchall()
