@@ -20,6 +20,7 @@ select_chats = 'SELECT chat FROM chats WHERE login = %s;'
 select_message_lastId =  'SELECT messageId FROM messages ORDER BY messageId DESC LIMIT 1'
 insert_message = 'INSERT INTO messages (messageId, login1, login2, text) VALUES (%s, %s, %s, %s)'
 select_history = 'SELECT login1, text FROM messages WHERE (login1 = %s AND login2 = %s) OR (login1 = %s AND login2 = %s) ORDER BY messageId ASC'
+insert_new_message = 'INSERT INTO new_messages (id, login1, login2) VALUES (%s, %s, %s)'
 
 app = Flask("server")
 
@@ -137,7 +138,9 @@ def send_message():
         my_cursor.execute(select_message_lastId)
         last_id = my_cursor.fetchone()
         message = (last_id[0] + 1, responce['login1'],  responce['login2'], responce['text'])
+        new_message = (last_id[0] + 1, responce['login1'], responce['login2'])
         my_cursor.execute(insert_message, message)
+        my_cursor.execute(insert_new_message, new_message)
         my_db.commit()
         return 'Success'
     else:
