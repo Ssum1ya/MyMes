@@ -112,6 +112,17 @@ def get_users():
 @app.route('/get_new_messages', methods = ['GET', 'POST'])
 def get_new_messages():
     if request.method == 'POST':
+        responce = request.get_json()
+
+        my_cursor.execute(select_new_message_id, (responce['login1'], responce['login2'],))
+        new_ids = my_cursor.fetchall()
+        new_ids_array = []
+        for i in range(len(new_ids)):
+            new_ids_array.append(new_ids[i][0])
+        
+        new_messages_array = []
+        for i in range(len(new_ids_array)):
+            my_cursor.execute(select_new_message, (new_ids_array[i]))
         pass
     else:
         pass
