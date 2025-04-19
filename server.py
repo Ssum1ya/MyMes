@@ -22,7 +22,7 @@ insert_message = 'INSERT INTO messages (messageId, login1, login2, text) VALUES 
 select_history = 'SELECT login1, text FROM messages WHERE (login1 = %s AND login2 = %s) OR (login1 = %s AND login2 = %s) ORDER BY messageId ASC'
 insert_new_message = 'INSERT INTO new_messages (id, login1, login2) VALUES (%s, %s, %s)'
 delete_new_message = 'DELETE FROM new_messages WHERE login1 = %s AND login2 = %s;' # SET SQL_SAFE_UPDATES = 0;
-select_new_message_id = 'SELECT id FROM new_messages where login1 = %s AND login2 = %s'
+select_new_message_id = 'SELECT id FROM new_messages where login1 = %s AND login2 = %s ORDER BY id ASC'
 select_new_message = 'SELECT login1, text FROM messages WHERE messageId = %s'
 
 app = Flask("server")
