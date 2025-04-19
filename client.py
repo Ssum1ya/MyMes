@@ -127,6 +127,9 @@ def load_hitory_in_runtime(msg_list, user_chat):
                 message = message_mas[i]
                 msg_list.insert(END, f'{login1} : {message}')
 
+def load_new_message(msg_list, user_chat):
+    pass
+
 def send_message(message, msg_list, user_chat):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat,
