@@ -110,7 +110,7 @@ def chat(user_chat):
         message = message_mas[i]
         msg_list.insert(END, f'{login1} : {message}')
     
-    loading_history_thread = Thread(target = lambda: load_hitory_in_runtime(msg_list, user_chat))
+    loading_history_thread = Thread(target = lambda: load_new_message(msg_list, user_chat)) #target = lambda: load_hitory_in_runtime(msg_list, user_chat)
     loading_history_thread.start()
 
 def load_hitory_in_runtime(msg_list, user_chat):
@@ -127,9 +127,31 @@ def load_hitory_in_runtime(msg_list, user_chat):
                 message = message_mas[i]
                 msg_list.insert(END, f'{login1} : {message}')
 
-def load_new_message(msg_list, user_chat):
-    request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1' : user_chat, 
+def load_new_message(msg_list, user_chat):              
+    while True:
+        sleep(5)
+        request = requests.post('http://127.0.0.1:5000/get_new_messages', json = {'login1' : user_chat, 
                                                                           'login2': login_password_id__array[0]})
+        messages = request.content.decode()
+        messages_array = messages[1: -2].split(',')
+        lenght = len(messages_array)
+        
+        message_mas = []
+        login1_mas = []
+
+        for i in range(0, lenght, 2):
+            login1_mas.append(messages_array[i][10: -1])
+
+        for i in range(1, lenght, 2):
+            if i == lenght - 1:
+                message_mas.append(messages_array[i][6 : -6].encode('utf-8').decode('unicode_escape'))
+            else:
+                message_mas.append(messages_array[i][6 : -5].encode('utf-8').decode('unicode_escape'))
+        
+        for i in range(len(message_mas)):
+            login1 = login1_mas[i]
+            message = message_mas[i]
+            msg_list.insert(END, f'{login1} : {message}')
 
 def send_message(message, msg_list, user_chat):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],

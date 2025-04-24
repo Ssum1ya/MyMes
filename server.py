@@ -119,13 +119,19 @@ def get_new_messages():
         new_ids_array = []
         for i in range(len(new_ids)):
             new_ids_array.append(new_ids[i][0])
-        
+
         new_messages_array = []
         for i in range(len(new_ids_array)):
-            my_cursor.execute(select_new_message, (new_ids_array[i]))
-        pass
+            my_cursor.execute(select_new_message, (new_ids_array[i],))
+            login1_text = my_cursor.fetchall()
+            new_messages_array.append([login1_text[0][0], login1_text[0][1]])
+
+        my_cursor.execute(delete_new_message, (responce['login1'], responce['login2'])) # multi = True
+        my_db.commit()
+
+        return new_messages_array
     else:
-        pass
+        return 'no request'
 
 @app.route('/get_history', methods = ['GET', 'POST'])
 def get_history():
