@@ -110,22 +110,8 @@ def chat(user_chat):
         message = message_mas[i]
         msg_list.insert(END, f'{login1} : {message}')
     
-    loading_history_thread = Thread(target = lambda: load_new_message(msg_list, user_chat)) #target = lambda: load_hitory_in_runtime(msg_list, user_chat)
+    loading_history_thread = Thread(target = lambda: load_new_message(msg_list, user_chat))
     loading_history_thread.start()
-
-def load_hitory_in_runtime(msg_list, user_chat):
-        while True:
-            sleep(5)
-            try:
-                msg_list.delete(0, msg_list.size())
-            except:
-                break
-            
-            login1_mas, message_mas = show_history_messages(user_chat)
-            for i in range(len(message_mas)):
-                login1 = login1_mas[i]
-                message = message_mas[i]
-                msg_list.insert(END, f'{login1} : {message}')
 
 def load_new_message(msg_list, user_chat):              
     while True:
