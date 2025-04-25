@@ -144,7 +144,6 @@ def get_history():
     if request.method == 'POST':
         responce = request.get_json()
         
-        print(responce['login1'], responce['login2'])
         my_cursor.execute(delete_new_message, (responce['login2'], responce['login1'])) # multi = True
         my_db.commit()
 
