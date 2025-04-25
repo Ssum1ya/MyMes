@@ -12,12 +12,15 @@ root.geometry('400x600')
 root.title('Войти в систему')
 
 login_password_id__array = []
+thread_flag = True
 
 def clear():
     for widget in root.winfo_children():
     	widget.destroy()
 
 def main_menu():
+    global thread_flag
+    thread_flag = False
     clear()
     main_title = Label(text = 'Главное Меню')
     button_back = Button(text = 'Назад', command = choise)
@@ -84,6 +87,8 @@ def check_login_in_bd(user_login):
         add_person2chats()
 
 def chat(user_chat):
+    global thread_flag
+    thread_flag = True
     clear()
     login1_mas, message_mas = show_history_messages(user_chat)
         
@@ -119,7 +124,7 @@ def chat(user_chat):
 
 def load_new_message(msg_list, user_chat):
     flag = True              
-    while flag:
+    while flag and thread_flag:
         sleep(5)
         request = requests.post('http://127.0.0.1:5000/get_new_messages', json = {'login1' : user_chat, 
                                                                           'login2': login_password_id__array[0]})
