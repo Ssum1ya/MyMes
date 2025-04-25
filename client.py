@@ -5,17 +5,22 @@ import requests
 from threading import Thread
 from time import sleep
 
+from ServerResponceHandler import ServerResponceHandler
+
 root = Tk()
 root.geometry('400x600')
 root.title('Войти в систему')
 
 login_password_id__array = []
+thread_flag = True
 
 def clear():
     for widget in root.winfo_children():
     	widget.destroy()
 
 def main_menu():
+    global thread_flag
+    thread_flag = False
     clear()
     main_title = Label(text = 'Главное Меню')
     button_back = Button(text = 'Назад', command = choise)
@@ -30,16 +35,18 @@ def show_my_chats():
     clear()
     main_title = Label(text = 'Ваш список чатов')
     main_title.pack()
+
     request = requests.post('http://127.0.0.1:5000/users', json = {'login': login_password_id__array[0]})
     chats = request.content.decode()
-    chats_array = chats[1:-2].split(',')
-    for i in range(len(chats_array)):
-        if i == len(chats_array) - 1:
-            users_chat = chats_array[i][4 : -2]
+
+    chats_mas, ids_mas = ServerResponceHandler.chats_handler(chats)
+    for i in range(len(chats_mas)):
+        if ids_mas[i] == '1':
+            chat_title = Label(text = chats_mas[i], background = "#00FF00") #background = "#00FF00"
         else:
-            users_chat = chats_array[i][4 : -1]
-        chat_title = Label(text = users_chat)
+            chat_title = Label(text = chats_mas[i])
         chat_title.pack()
+        
     select_title = Label(text = 'Напишите чат который хоите выбрать')
     select_title.pack()
     select_chat = Entry()
@@ -80,6 +87,8 @@ def check_login_in_bd(user_login):
         add_person2chats()
 
 def chat(user_chat):
+    global thread_flag
+    thread_flag = True
     clear()
     login1_mas, message_mas = show_history_messages(user_chat)
         
@@ -110,23 +119,25 @@ def chat(user_chat):
         message = message_mas[i]
         msg_list.insert(END, f'{login1} : {message}')
     
-    loading_history_thread = Thread(target = lambda: load_hitory_in_runtime(msg_list, user_chat))
+    loading_history_thread = Thread(target = lambda: load_new_message(msg_list, user_chat))
     loading_history_thread.start()
 
-def load_hitory_in_runtime(msg_list, user_chat):
-        while True:
-            sleep(5)
+def load_new_message(msg_list, user_chat):
+    flag = True              
+    while flag and thread_flag:
+        sleep(5)
+        request = requests.post('http://127.0.0.1:5000/get_new_messages', json = {'login1' : user_chat, 
+                                                                          'login2': login_password_id__array[0]})
+        messages = request.content.decode()
+        login1_mas, message_mas = ServerResponceHandler.message_handler(messages)
+        
+        for i in range(len(message_mas)):
+            login1 = login1_mas[i]
+            message = message_mas[i]
             try:
-                msg_list.delete(0, msg_list.size())
-            except:
-                break
-            
-            login1_mas, message_mas = show_history_messages(user_chat)
-            for i in range(len(message_mas)):
-                login1 = login1_mas[i]
-                message = message_mas[i]
                 msg_list.insert(END, f'{login1} : {message}')
-
+            except:
+                flag = False
 
 def send_message(message, msg_list, user_chat):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
@@ -138,20 +149,7 @@ def show_history_messages(user_chat):
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat})
     messages = request.content.decode()
-    messages_array = messages[1: -2].split(',')
-    lenght = len(messages_array)
-
-    message_mas = []
-    login1_mas = []
-
-    for i in range(0, lenght, 2):
-        login1_mas.append(messages_array[i][10: -1])
-
-    for i in range(1, lenght, 2):
-        if i == lenght - 1:
-            message_mas.append(messages_array[i][6 : -6].encode('utf-8').decode('unicode_escape'))
-        else:
-            message_mas.append(messages_array[i][6 : -5].encode('utf-8').decode('unicode_escape'))
+    login1_mas, message_mas = ServerResponceHandler.message_handler(messages)
     
     return login1_mas, message_mas
 

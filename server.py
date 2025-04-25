@@ -20,6 +20,10 @@ select_chats = 'SELECT chat FROM chats WHERE login = %s;'
 select_message_lastId =  'SELECT messageId FROM messages ORDER BY messageId DESC LIMIT 1'
 insert_message = 'INSERT INTO messages (messageId, login1, login2, text) VALUES (%s, %s, %s, %s)'
 select_history = 'SELECT login1, text FROM messages WHERE (login1 = %s AND login2 = %s) OR (login1 = %s AND login2 = %s) ORDER BY messageId ASC'
+insert_new_message = 'INSERT INTO new_messages (id, login1, login2) VALUES (%s, %s, %s)'
+delete_new_message = 'DELETE FROM new_messages WHERE login1 = %s AND login2 = %s;' # SET SQL_SAFE_UPDATES = 0;
+select_new_message_id = 'SELECT id FROM new_messages where login1 = %s AND login2 = %s ORDER BY id ASC'
+select_new_message = 'SELECT login1, text FROM messages WHERE messageId = %s'
 
 app = Flask("server")
 
@@ -98,9 +102,15 @@ def get_users():
         
         my_cursor.execute(select_chats, (responce['login'],))
         chats = my_cursor.fetchall()
+
         chats_array = []
         for i in range(len(chats)):
-            chats_array.append(chats[i][0])
+            my_cursor.execute(select_new_message_id, (chats[i][0], responce['login'],))
+            new_ids = my_cursor.fetchall()
+            
+            if len(new_ids) == 0: chats_array.append([chats[i][0], 0])
+            else: chats_array.append([chats[i][0], 1])
+
         return chats_array
     else:
         return 'no request'
@@ -108,14 +118,34 @@ def get_users():
 @app.route('/get_new_messages', methods = ['GET', 'POST'])
 def get_new_messages():
     if request.method == 'POST':
-        pass
+        responce = request.get_json()
+
+        my_cursor.execute(select_new_message_id, (responce['login1'], responce['login2'],))
+        new_ids = my_cursor.fetchall()
+        new_ids_array = []
+        for i in range(len(new_ids)):
+            new_ids_array.append(new_ids[i][0])
+
+        new_messages_array = []
+        for i in range(len(new_ids_array)):
+            my_cursor.execute(select_new_message, (new_ids_array[i],))
+            login1_text = my_cursor.fetchall()
+            new_messages_array.append([login1_text[0][0], login1_text[0][1]])
+
+        my_cursor.execute(delete_new_message, (responce['login1'], responce['login2'])) # multi = True
+        my_db.commit()
+
+        return new_messages_array
     else:
-        pass
+        return 'no request'
 
 @app.route('/get_history', methods = ['GET', 'POST'])
 def get_history():
     if request.method == 'POST':
         responce = request.get_json()
+        
+        my_cursor.execute(delete_new_message, (responce['login2'], responce['login1'])) # multi = True
+        my_db.commit()
 
         my_cursor.execute(select_history, (responce['login1'], responce['login2'], responce['login2'], responce['login1'],))
         messages = my_cursor.fetchall()
@@ -137,7 +167,9 @@ def send_message():
         my_cursor.execute(select_message_lastId)
         last_id = my_cursor.fetchone()
         message = (last_id[0] + 1, responce['login1'],  responce['login2'], responce['text'])
+        new_message = (last_id[0] + 1, responce['login1'], responce['login2'])
         my_cursor.execute(insert_message, message)
+        my_cursor.execute(insert_new_message, new_message)
         my_db.commit()
         return 'Success'
     else:
