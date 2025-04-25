@@ -5,6 +5,8 @@ import requests
 from threading import Thread
 from time import sleep
 
+from ServerResponceHandler import ServerResponceHandler
+
 root = Tk()
 root.geometry('400x600')
 root.title('Войти в систему')
@@ -38,7 +40,7 @@ def show_my_chats():
             users_chat = chats_array[i][4 : -2]
         else:
             users_chat = chats_array[i][4 : -1]
-        chat_title = Label(text = users_chat)
+        chat_title = Label(text = users_chat) #background = "#00FF00"
         chat_title.pack()
     select_title = Label(text = 'Напишите чат который хоите выбрать')
     select_title.pack()
@@ -113,31 +115,22 @@ def chat(user_chat):
     loading_history_thread = Thread(target = lambda: load_new_message(msg_list, user_chat))
     loading_history_thread.start()
 
-def load_new_message(msg_list, user_chat):              
-    while True:
+def load_new_message(msg_list, user_chat):
+    flag = True              
+    while flag:
         sleep(5)
         request = requests.post('http://127.0.0.1:5000/get_new_messages', json = {'login1' : user_chat, 
                                                                           'login2': login_password_id__array[0]})
         messages = request.content.decode()
-        messages_array = messages[1: -2].split(',')
-        lenght = len(messages_array)
-        
-        message_mas = []
-        login1_mas = []
-
-        for i in range(0, lenght, 2):
-            login1_mas.append(messages_array[i][10: -1])
-
-        for i in range(1, lenght, 2):
-            if i == lenght - 1:
-                message_mas.append(messages_array[i][6 : -6].encode('utf-8').decode('unicode_escape'))
-            else:
-                message_mas.append(messages_array[i][6 : -5].encode('utf-8').decode('unicode_escape'))
+        login1_mas, message_mas = ServerResponceHandler.message_handler(messages)
         
         for i in range(len(message_mas)):
             login1 = login1_mas[i]
             message = message_mas[i]
-            msg_list.insert(END, f'{login1} : {message}')
+            try:
+                msg_list.insert(END, f'{login1} : {message}')
+            except:
+                flag = False
 
 def send_message(message, msg_list, user_chat):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
@@ -149,20 +142,7 @@ def show_history_messages(user_chat):
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat})
     messages = request.content.decode()
-    messages_array = messages[1: -2].split(',')
-    lenght = len(messages_array)
-
-    message_mas = []
-    login1_mas = []
-
-    for i in range(0, lenght, 2):
-        login1_mas.append(messages_array[i][10: -1])
-
-    for i in range(1, lenght, 2):
-        if i == lenght - 1:
-            message_mas.append(messages_array[i][6 : -6].encode('utf-8').decode('unicode_escape'))
-        else:
-            message_mas.append(messages_array[i][6 : -5].encode('utf-8').decode('unicode_escape'))
+    login1_mas, message_mas = ServerResponceHandler.message_handler(messages)
     
     return login1_mas, message_mas
 
