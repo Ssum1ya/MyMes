@@ -102,9 +102,15 @@ def get_users():
         
         my_cursor.execute(select_chats, (responce['login'],))
         chats = my_cursor.fetchall()
+
         chats_array = []
         for i in range(len(chats)):
-            chats_array.append(chats[i][0])
+            my_cursor.execute(select_new_message_id, (chats[i][0], responce['login'],))
+            new_ids = my_cursor.fetchall()
+            
+            if len(new_ids) == 0: chats_array.append([chats[i][0], 0])
+            else: chats_array.append([chats[i][0], 1])
+
         return chats_array
     else:
         return 'no request'

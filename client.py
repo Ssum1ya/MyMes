@@ -32,16 +32,18 @@ def show_my_chats():
     clear()
     main_title = Label(text = 'Ваш список чатов')
     main_title.pack()
+
     request = requests.post('http://127.0.0.1:5000/users', json = {'login': login_password_id__array[0]})
     chats = request.content.decode()
-    chats_array = chats[1:-2].split(',')
-    for i in range(len(chats_array)):
-        if i == len(chats_array) - 1:
-            users_chat = chats_array[i][4 : -2]
+
+    chats_mas, ids_mas = ServerResponceHandler.chats_handler(chats)
+    for i in range(len(chats_mas)):
+        if ids_mas[i] == '1':
+            chat_title = Label(text = chats_mas[i], background = "#00FF00") #background = "#00FF00"
         else:
-            users_chat = chats_array[i][4 : -1]
-        chat_title = Label(text = users_chat) #background = "#00FF00"
+            chat_title = Label(text = chats_mas[i])
         chat_title.pack()
+        
     select_title = Label(text = 'Напишите чат который хоите выбрать')
     select_title.pack()
     select_chat = Entry()
