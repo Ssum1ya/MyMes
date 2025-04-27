@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Button, Entry, Listbox, Frame, StringVar, Scrollbar
+from tkinter import Tk, Label, Button, Entry, Listbox, Frame, Scrollbar, Text
 from tkinter import RIGHT, LEFT, BOTH, Y, END
 from tkinter import messagebox
 import requests
@@ -103,11 +103,10 @@ def chat(user_chat):
 
     button_back = Button(text = 'Назад', command = main_menu)
 
-    entry_field = Entry(root)
-    entry_field.bind('<Return>')
+    entry_field = Text(height=5, wrap="char")
     entry_field.pack()
 
-    send_button = Button(root, text = 'отправить', command = lambda: send_message(entry_field.get(), msg_list, user_chat, entry_field))
+    send_button = Button(root, text = 'отправить', command = lambda: send_message(entry_field.get("1.0", END), msg_list, user_chat, entry_field))
     button_back.pack()
     send_button.pack()
     root.protocol("WM_DELETE_WINDOW")
@@ -146,7 +145,7 @@ def send_message(message, msg_list, user_chat, entry_field):
                                                                                      'text': message})
     msg_list.insert(END, f'{login_password_id__array[0]} : {message}')
     msg_list.yview_scroll(number = 1, what = 'units')
-    entry_field.delete(0, END)
+    entry_field.delete("1.0", END)
 
 def show_history_messages(user_chat):
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
