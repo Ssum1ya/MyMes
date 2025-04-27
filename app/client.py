@@ -118,7 +118,9 @@ def chat(user_chat):
         login1 = login1_mas[i]
         message = message_mas[i]
         msg_list.insert(END, f'{login1} : {message}')
-    
+
+    msg_list.yview_scroll(number = len(message_mas), what = 'units')
+
     loading_history_thread = Thread(target = lambda: load_new_message(msg_list, user_chat))
     loading_history_thread.start()
 
@@ -138,12 +140,14 @@ def load_new_message(msg_list, user_chat):
                 msg_list.insert(END, f'{login1} : {message}')
             except:
                 flag = False
+            msg_list.yview_scroll(number = 1, what = 'units')
 
 def send_message(message, msg_list, user_chat):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat,
                                                                                      'text': message})
     msg_list.insert(END, f'{login_password_id__array[0]} : {message}')
+    msg_list.yview_scroll(number = 1, what = 'units')
 
 def show_history_messages(user_chat):
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
