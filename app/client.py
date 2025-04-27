@@ -93,8 +93,6 @@ def chat(user_chat):
     login1_mas, message_mas = show_history_messages(user_chat)
         
     messages_frame = Frame(root)
-    my_msg = StringVar()
-    my_msg.set('Введите ваше сообщение здесь.')
     scrollbar = Scrollbar(messages_frame)
 
     msg_list = Listbox(messages_frame, height = 15, width = 50, yscrollcommand = scrollbar.set)
@@ -105,11 +103,11 @@ def chat(user_chat):
 
     button_back = Button(text = 'Назад', command = main_menu)
 
-    entry_field = Entry(root, textvariable = my_msg)
+    entry_field = Entry(root)
     entry_field.bind('<Return>')
     entry_field.pack()
 
-    send_button = Button(root, text = 'отправить', command = lambda: send_message(entry_field.get(), msg_list, user_chat))
+    send_button = Button(root, text = 'отправить', command = lambda: send_message(entry_field.get(), msg_list, user_chat, entry_field))
     button_back.pack()
     send_button.pack()
     root.protocol("WM_DELETE_WINDOW")
@@ -142,12 +140,13 @@ def load_new_message(msg_list, user_chat):
                 flag = False
             msg_list.yview_scroll(number = 1, what = 'units')
 
-def send_message(message, msg_list, user_chat):
+def send_message(message, msg_list, user_chat, entry_field):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat,
                                                                                      'text': message})
     msg_list.insert(END, f'{login_password_id__array[0]} : {message}')
     msg_list.yview_scroll(number = 1, what = 'units')
+    entry_field.delete(0, END)
 
 def show_history_messages(user_chat):
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
