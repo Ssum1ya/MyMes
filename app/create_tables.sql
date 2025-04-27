@@ -1,0 +1,25 @@
+use testdb;
+
+CREATE TABLE chats(
+	login VARCHAR(20) NOT NULL,
+    chat VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE messages(
+	messageId BIGINT NOT NULL PRIMARY KEY,
+    login1 VARCHAR(20) NOT NULL,
+    login2 VARCHAR(20) NOT NULL,
+    text VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE users(
+	id BIGINT NOT NULL PRIMARY KEY,
+    login VARCHAR(20) NOT NULL,
+    password VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE new_messages(
+    id BIGINT NOT NULL PRIMARY KEY,
+    login1 VARCHAR(20) NOT NULL,
+    login2 VARCHAR(20) NOT NULL
+);
