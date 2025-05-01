@@ -95,7 +95,7 @@ def chat(user_chat):
     messages_frame = Frame(root)
     scrollbar = Scrollbar(messages_frame)
 
-    msg_list = Listbox(messages_frame, height = 15, width = 50, yscrollcommand = scrollbar.set)
+    msg_list = Listbox(messages_frame, height = 25, width = 70, yscrollcommand = scrollbar.set)
     scrollbar.pack(side = RIGHT, fill = Y)
     msg_list.pack(side = LEFT, fill = BOTH)
     msg_list.pack()
