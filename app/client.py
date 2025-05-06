@@ -26,7 +26,7 @@ def main_menu():
     thread_flag = False
     clear()
     main_title = Label(text = 'Главное Меню')
-    button_back = Button(text = 'Назад', command = choise)
+    button_back = Button(text = 'Назад', command = login)
     button_chats = Button(text = 'Мои чаты', command = lambda: show_my_chats())
     button_add2chats = Button(text = 'добавить человека в чат', command = lambda: add_person2chats())
     main_title.pack()
@@ -157,13 +157,6 @@ def show_history_messages(user_chat):
     login1_mas, message_mas = ServerResponceHandler.message_handler(messages)
     
     return login1_mas, message_mas
-
-def choise():
-    clear()
-    button_registr = Button(text = 'Зарегистрироваться', command = registration)
-    buttion_login = Button(text = 'Войти', command = login)
-    button_registr.pack()
-    buttion_login.pack()
 
 def login():
     clear()
