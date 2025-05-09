@@ -70,14 +70,27 @@ def show_my_chats():
 
 def add_person2chats():
     clear()
-    main_title = Label(text = 'Введите логин того кого хотите добавить в чаты')
-    person_login = Entry()
-    button_check = Button(text = 'Добавить', command = lambda : check_login_in_bd(person_login.get(), ))
-    button_back = Button(text = 'Назад', command = main_menu)
-    main_title.pack()
-    person_login.pack()
-    button_check.pack()
-    button_back.pack()
+    root.title('Main menu')
+    root.geometry('400x250')
+    root.configure(bg = "#fff")
+    root.resizable(False, False)
+
+    frame = Frame(root, width = 400, height = 400, bg = "white")
+    frame.place(x = 0, y = 0)
+
+    heading = Label(frame, text = 'Add person to my chats', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 20, 'bold'))
+    heading.place(x = 30, y = 10)
+
+    heading = Label(frame, text = 'Введите логин того кого хотите добавить в чаты', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 11, 'bold'))
+    heading.place(x = 0, y = 60)
+
+    person_login = Entry(frame, width = 40, fg = 'black', border = 0, bg = "white", font = ('Microsoft YaHei UI Light', 11), )
+    person_login.place(x = 45, y = 100)
+
+    Frame(frame, width = 295, height = 2, bg = 'black').place(x = 45, y = 127)
+
+    Button(frame, width = 39, pady = 7, text = 'Добавить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda : check_login_in_bd(person_login.get(), )).place(x = 55, y = 157)
+    Button(frame, width = 39, pady = 7, text = 'Back', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 207)
 
 def check_login_in_bd(user_login):
     request = requests.post('http://127.0.0.1:5000/add_person2chats', json = {'chat': user_login,
