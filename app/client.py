@@ -40,30 +40,37 @@ def main_menu():
 
 def show_my_chats():
     clear()
-    main_title = Label(text = 'Ваш список чатов')
-    main_title.pack()
+    root.title('Main menu')
+    root.geometry('400x600')
+    root.configure(bg = "#fff")
+    root.resizable(False, False)
+
+    frame = Frame(root, width = 350, height = 600, bg = "white")
+    frame.place(x = 0, y = 0)
+
+    scrollbar = Scrollbar(frame)
+
+    heading = Label(frame, text = 'Ваши чаты', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 23, 'bold'))
+    heading.place(x = 120, y = 10)
 
     request = requests.post('http://127.0.0.1:5000/users', json = {'login': login_password_id__array[0]})
     chats = request.content.decode()
 
     chats_mas, ids_mas = ServerResponceHandler.chats_handler(chats)
-    print(chats_mas, len(ids_mas))
+    y = 70
     if len(ids_mas) != 0:
         for i in range(len(chats_mas)):
             if ids_mas[i] == '1':
-                chat_title = Label(text = chats_mas[i], background = "#00FF00") #background = "#00FF00"
+                user_button = Button(frame, width = 39, pady = 7, text = chats_mas[i], bg = '#00FF00', fg = 'black', border = 0)
+                user_button['command'] = lambda user_chat=chats_mas[i]: chat(user_chat)
+                user_button.place(x = 65, y = y)
             else:
-                chat_title = Label(text = chats_mas[i])
-            chat_title.pack()
-        
-    select_title = Label(text = 'Напишите чат который хоите выбрать')
-    select_title.pack()
-    select_chat = Entry()
-    select_chat_button = Button(text = 'Выбрать чат', command = lambda : chat(select_chat.get()))
-    select_chat.pack()
-    select_chat_button.pack()
-    button_back = Button(text = 'Назад', command = main_menu)
-    button_back.pack()
+                user_button = Button(frame, width = 39, pady = 7, text = chats_mas[i], bg = '#57a1f8', fg = 'white', border = 0)
+                user_button['command'] = lambda user_chat=chats_mas[i]: chat(user_chat)
+                user_button.place(x = 65, y = y)
+            y += 50
+    
+    Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 65, y = y)
 
 def add_person2chats():
     clear()
