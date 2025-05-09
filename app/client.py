@@ -50,12 +50,14 @@ def show_my_chats():
     chats = request.content.decode()
 
     chats_mas, ids_mas = ServerResponceHandler.chats_handler(chats)
-    for i in range(len(chats_mas)):
-        if ids_mas[i] == '1':
-            chat_title = Label(text = chats_mas[i], background = "#00FF00") #background = "#00FF00"
-        else:
-            chat_title = Label(text = chats_mas[i])
-        chat_title.pack()
+    print(chats_mas, len(ids_mas))
+    if len(ids_mas) != 0:
+        for i in range(len(chats_mas)):
+            if ids_mas[i] == '1':
+                chat_title = Label(text = chats_mas[i], background = "#00FF00") #background = "#00FF00"
+            else:
+                chat_title = Label(text = chats_mas[i])
+            chat_title.pack()
         
     select_title = Label(text = 'Напишите чат который хоите выбрать')
     select_title.pack()
