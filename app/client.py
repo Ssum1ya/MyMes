@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Button, Entry, Listbox, Frame, Scrollbar, Text
+from tkinter import Tk, Label, Button, Entry, Listbox, Frame, Scrollbar, Text, PhotoImage
 from tkinter import RIGHT, LEFT, BOTH, Y, END
 from tkinter import messagebox
 import requests
@@ -8,8 +8,11 @@ from time import sleep
 from ServerResponceHandler import ServerResponceHandler
 
 root = Tk()
-root.geometry('400x600')
-root.title('Войти в систему')
+log_img = PhotoImage(file = 'app/images/login.png')
+reg_img = PhotoImage(file = 'app/images/reg.png')
+
+# root.geometry('400x600')
+# root.title('Войти в систему')
 
 login_password_id__array = []
 thread_flag = True
@@ -23,7 +26,7 @@ def main_menu():
     thread_flag = False
     clear()
     main_title = Label(text = 'Главное Меню')
-    button_back = Button(text = 'Назад', command = choise)
+    button_back = Button(text = 'Назад', command = login)
     button_chats = Button(text = 'Мои чаты', command = lambda: show_my_chats())
     button_add2chats = Button(text = 'добавить человека в чат', command = lambda: add_person2chats())
     main_title.pack()
@@ -155,33 +158,43 @@ def show_history_messages(user_chat):
     
     return login1_mas, message_mas
 
-def choise():
+def login():
     clear()
-    button_registr = Button(text = 'Зарегистрироваться', command = registration)
-    buttion_login = Button(text = 'Войти', command = login)
-    button_registr.pack()
-    buttion_login.pack()
+    root.title('Login')
+    root.geometry('925x500+300+200')
+    root.configure(bg = "#fff")
+    root.resizable(False, False)
 
-def registration():
-    clear()
-    main_title = Label(text = 'Для входа в систему зарегистрируйтесь')
-    button_back = Button(text = 'Назад', command = choise)
-    log_title = Label(text = 'Введите Ваш логин')
-    reg_login = Entry()
-    title_password1 = Label(text = 'Введите Ваш пароль')
-    reg_password1 = Entry()
-    title_password2 = Label(text = 'Еще раз пароль:')
-    reg_password2 = Entry(show = '*')
-    button_regist = Button(text = 'Зарегистрироваться', command = lambda: reg(reg_login.get(), reg_password1.get(), reg_password2.get()))
-    main_title.pack()
-    button_back.pack()
-    log_title.pack()
-    reg_login.pack()
-    title_password1.pack()
-    reg_password1.pack()
-    title_password2.pack()
-    reg_password2.pack()
-    button_regist.pack()
+    Label(root, image = log_img, bg = 'white').place(x = 50, y = 50)
+
+    frame = Frame(root, width = 350, height = 350, bg = "white")
+    frame.place(x = 480, y = 70)
+
+    heading = Label(frame, text = 'Sign in', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 23, 'bold'))
+    heading.place(x = 100, y = 5)
+
+    heading = Label(frame, text = 'Username', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 11, 'bold'))
+    heading.place(x = 20, y = 50)
+
+    user = Entry(frame, width = 25, fg = 'black', border = 0, bg = "white", font = ('Microsoft YaHei UI Light', 11), )
+    user.place(x = 30, y = 80)
+
+    Frame(frame, width = 295, height = 2, bg = 'black').place(x = 25, y = 107)
+
+    heading = Label(frame, text = 'Password', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 11, 'bold'))
+    heading.place(x = 20, y = 120)
+
+    code = Entry(frame, width = 25, fg = 'black', border = 0, bg = 'white', font = ('Microsoft YaHei UI Light', 11), show = '*')
+    code.place(x = 30, y = 150) 
+
+    Frame(frame, width = 295, height = 2, bg = 'black').place(x = 25, y = 177)
+
+    Button(frame, width = 39, pady = 7, text = 'Sign in', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: log(user.get(), code.get())).place(x = 35, y = 204)
+    label = Label(frame, text = "Don't have an account?", fg = 'black', bg = 'white', font = ('Microsoft YaHei UI Light', 9))
+    label.place(x = 75, y = 270)
+
+    sign_up = Button(frame, width = 6, text = 'Sign up', border = 0, bg = 'white', cursor = 'hand2', fg = '#57a1f8', command = registration)
+    sign_up.place(x = 215, y = 270)
 
 def reg(user_login, password1, password2):
     if password1 != password2:
@@ -191,30 +204,61 @@ def reg(user_login, password1, password2):
         request = requests.post('http://127.0.0.1:5000/registration', json = {'login': user_login,
                                                                         'password': password1})
         if request.content == b'Success':
+            messagebox.showinfo('Успешно', 'Теперь войдите под своей учетной записью')
             login()
         elif request.content == b'Denied':
             messagebox.showinfo('Ошибка', 'Не удалось зарегестрироваться так как такой логин уже есть')
-            choise()
+            registration()
         elif request.content == b'Denied long login':
             messagebox.showinfo('Ошибка', 'Не удалось зарегестрироваться так как логин слишком длинный')
-            choise()
+            registration()
     
-def login():
+def registration():
     clear()
-    main_title = Label(text = 'Теперь вы можете войти в систему.')
-    button_back = Button(text = 'Назад', command = choise)
-    login_title = Label(text = 'Введите ваш логин: ')
-    reg_login = Entry()
-    password_title = Label(text = 'Введите ваш пароль: ')
-    reg_password = Entry(show = '*')
-    button_enter = Button(text = 'Войти', command = lambda: log(reg_login.get(), reg_password.get()))
-    main_title.pack()
-    button_back.pack()
-    login_title.pack()
-    reg_login.pack()
-    password_title.pack()
-    reg_password.pack()
-    button_enter.pack()
+    root.title('Registration')
+    root.geometry('925x500+300+200')
+    root.configure(bg = "#fff")
+    root.resizable(False, False)
+
+    Label(root, image = reg_img, bg = 'white').place(x = 50, y = 50)
+
+    frame = Frame(root, width = 350, height = 350, bg = "white")
+    frame.place(x = 480, y = 70)
+
+    heading = Label(frame, text = 'Sign up', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 23, 'bold'))
+    heading.place(x = 100, y = 5)
+
+    heading = Label(frame, text = 'Username', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 11, 'bold'))
+    heading.place(x = 20, y = 50)
+
+    user = Entry(frame, width = 25, fg = 'black', border = 0, bg = "white", font = ('Microsoft YaHei UI Light', 11))
+    user.place(x = 30, y = 80)
+
+    Frame(frame, width = 295, height = 2, bg = 'black').place(x = 25, y = 107)
+
+    code = Entry(frame, width = 25, fg = 'black', border = 0, bg = 'white', font = ('Microsoft YaHei UI Light', 11), show = '*')
+    code.place(x = 30, y = 150)
+
+    heading = Label(frame, text = 'Password', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 11, 'bold'))
+    heading.place(x = 20, y = 120) 
+
+    Frame(frame, width = 295, height = 2, bg = 'black').place(x = 25, y = 177)
+
+    heading = Label(frame, text = 'Conform Password', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 11, 'bold'))
+    heading.place(x = 20, y = 190) 
+
+    conform_code = Entry(frame, width = 25, fg = 'black', border = 0, bg = 'white', font = ('Microsoft YaHei UI Light', 11), show = '*')
+    conform_code.place(x = 30, y = 220) 
+
+    Frame(frame, width = 295, height = 2, bg = 'black').place(x = 25, y = 247)
+    
+
+    Button(frame, width = 39, pady = 7, text = 'Sign in', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: reg(user.get(), code.get(), conform_code.get())).place(x = 35, y = 280)
+    label = Label(frame, text = "I have an account", fg = 'black', bg = 'white', font = ('Microsoft YaHei UI Light', 9))
+    label.place(x = 90, y = 320)
+
+    sign_up = Button(frame, width = 6, text = 'Sign in', border = 0, bg = 'white', cursor = 'hand2', fg = '#57a1f8', command = login)
+    sign_up.place(x = 200, y = 320)
 
 def log(user_login, user_password):
     request = requests.post('http://127.0.0.1:5000/login', json = {'login': user_login,
@@ -230,5 +274,6 @@ def log(user_login, user_password):
         messagebox.showinfo('Ошибка', 'войти так как не удалось найти совпадения')
         login()
 
-choise()
+login()
+
 root.mainloop()
