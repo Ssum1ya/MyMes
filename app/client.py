@@ -25,14 +25,21 @@ def main_menu():
     global thread_flag
     thread_flag = False
     clear()
-    main_title = Label(text = 'Главное Меню')
-    button_back = Button(text = 'Назад', command = login)
-    button_chats = Button(text = 'Мои чаты', command = lambda: show_my_chats())
-    button_add2chats = Button(text = 'добавить человека в чат', command = lambda: add_person2chats())
-    main_title.pack()
-    button_add2chats.pack()
-    button_chats.pack()
-    button_back.pack()
+
+    root.title('Main menu')
+    root.geometry('400x250')
+    root.configure(bg = "#fff")
+    root.resizable(False, False)
+
+    frame = Frame(root, width = 350, height = 350, bg = "white")
+    frame.place(x = 0, y = 0)
+
+    heading = Label(frame, text = 'Main menu', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 23, 'bold'))
+    heading.place(x = 110, y = 10)
+
+    Button(frame, width = 39, pady = 7, text = 'My chats', bg = '#57a1f8', fg = 'white', border = 0,command = lambda: show_my_chats()).place(x = 65, y = 80)
+    Button(frame, width = 39, pady = 7, text = 'Add person to chats', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: add_person2chats()).place(x = 65, y = 130)
+    Button(frame, width = 39, pady = 7, text = 'Back', bg = '#57a1f8', fg = 'white', border = 0, command = login).place(x = 65, y = 180)
 
 def show_my_chats():
     clear()
@@ -93,6 +100,9 @@ def chat(user_chat):
     global thread_flag
     thread_flag = True
     clear()
+    root.title(user_chat)
+    root.geometry('400x600')
+
     login1_mas, message_mas = show_history_messages(user_chat)
         
     messages_frame = Frame(root)
