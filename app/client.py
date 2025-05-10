@@ -6,6 +6,7 @@ from threading import Thread
 from time import sleep
 
 from ServerResponceHandler import ServerResponceHandler
+from ChatsWindow import ChatsWindow
 
 root = Tk()
 log_img = PhotoImage(file = 'app/images/login.png')
@@ -40,7 +41,7 @@ def main_menu():
 
 def show_my_chats():
     clear()
-    root.title('Main menu')
+    root.title('My chats')
     root.geometry('400x600')
     root.configure(bg = "#fff")
     root.resizable(False, False)
@@ -55,20 +56,21 @@ def show_my_chats():
     chats = request.content.decode()
 
     chats_mas, ids_mas = ServerResponceHandler.chats_handler(chats)
-    y = 70
-    if len(ids_mas) != 0:
-        for i in range(len(chats_mas)):
-            if ids_mas[i] == '1':
-                user_button = Button(frame, width = 39, pady = 7, text = chats_mas[i], bg = '#00FF00', fg = 'black', border = 0)
-                user_button['command'] = lambda user_chat=chats_mas[i]: chat(user_chat)
-                user_button.place(x = 65, y = y)
-            else:
-                user_button = Button(frame, width = 39, pady = 7, text = chats_mas[i], bg = '#57a1f8', fg = 'white', border = 0)
-                user_button['command'] = lambda user_chat=chats_mas[i]: chat(user_chat)
-                user_button.place(x = 65, y = y)
-            y += 50
+
+    chats_mas_split = [chats_mas[i:i+9] for i in range(0, len(chats_mas), 9)]
+    ids_mas_split = [ids_mas[i:i+9] for i in range(0, len(ids_mas), 9)]
     
-    Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 65, y = y)
+    if len(ids_mas_split) != 0:
+        pages = {1: ChatsWindow(root = root, chats_ids = [chats_mas_split[0], ids_mas_split[0]], chat = chat, page = 1, main_menu = main_menu)}
+        pages[1].pages = pages
+        for i in range(1, len(chats_mas_split)):
+            pages[list(pages.keys())[-1] + 1] = ChatsWindow(root = root, chats_ids = [chats_mas_split[i], ids_mas_split[i]], chat = chat, page = list(pages.keys())[-1] + 1, main_menu = main_menu, pages = pages)
+        
+        ChatsWindow.last_page = list(pages.keys())[-1]
+
+        pages[1].draw()
+    else:
+        Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 65, y = 70)
 
 def add_person2chats():
     clear()
@@ -220,12 +222,12 @@ def login():
     label = Label(frame, text = "Нет учетной записи?", fg = 'black', bg = 'white', font = ('Microsoft YaHei UI Light', 9))
     label.place(x = 35, y = 270)
 
-    sign_up = Button(frame, width = 19, text = 'Зарегестрироваться', border = 0, bg = 'white', cursor = 'hand2', fg = '#57a1f8', command = registration)
+    sign_up = Button(frame, width = 19, text = 'Зарегистрироваться', border = 0, bg = 'white', cursor = 'hand2', fg = '#57a1f8', command = registration)
     sign_up.place(x = 165, y = 270)
 
 def reg(user_login, password1, password2):
     if password1 != password2:
-        messagebox.showinfo('Ошибка', 'Не удалось зарегестрироваться так как пароли не совпадают')
+        messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как пароли не совпадают')
         registration()
     else:
         request = requests.post('http://127.0.0.1:5000/registration', json = {'login': user_login,
@@ -234,10 +236,10 @@ def reg(user_login, password1, password2):
             messagebox.showinfo('Успешно', 'Теперь войдите под своей учетной записью')
             login()
         elif request.content == b'Denied':
-            messagebox.showinfo('Ошибка', 'Не удалось зарегестрироваться так как такой логин уже есть')
+            messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как такой логин уже есть')
             registration()
         elif request.content == b'Denied long login':
-            messagebox.showinfo('Ошибка', 'Не удалось зарегестрироваться так как логин слишком длинный')
+            messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как логин слишком длинный')
             registration()
     
 def registration():
