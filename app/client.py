@@ -48,8 +48,6 @@ def show_my_chats():
     frame = Frame(root, width = 350, height = 600, bg = "white")
     frame.place(x = 0, y = 0)
 
-    scrollbar = Scrollbar(frame)
-
     heading = Label(frame, text = 'Ваши чаты', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 23, 'bold'))
     heading.place(x = 120, y = 10)
 
