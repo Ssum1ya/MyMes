@@ -4,10 +4,6 @@ class ChatsWindow:
     last_page = 0
     def __init__(self, root, chats_ids, chat, page, main_menu, pages = None):
         self.window = root
-        self.window.title('My chats')
-        self.window.geometry('400x600')
-        self.window.configure(bg = "#fff")
-        self.window.resizable(False, False)
 
         self.chats_ids = chats_ids
         self.chat = chat
