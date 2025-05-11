@@ -46,6 +46,12 @@ def show_my_chats():
     root.configure(bg = "#fff")
     root.resizable(False, False)
 
+    frame = Frame(root, width = 350, height = 600, bg = "white")
+    frame.place(x = 0, y = 0)
+
+    heading = Label(frame, text = 'Ваши чаты', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 23, 'bold'))
+    heading.place(x = 120, y = 10)
+
     request = requests.post('http://127.0.0.1:5000/users', json = {'login': login_password_id__array[0]})
     chats = request.content.decode()
 
