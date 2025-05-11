@@ -4,7 +4,6 @@ class ChatsWindow:
     last_page = 0
     def __init__(self, root, chats_ids, chat, page, main_menu, pages = None):
         self.window = root
-
         self.chats_ids = chats_ids
         self.chat = chat
         self.page = page
