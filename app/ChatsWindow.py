@@ -1,16 +1,9 @@
-from tkinter import Tk, Label, Button, Entry, Listbox, Frame, Scrollbar, Text, PhotoImage
-from tkinter import RIGHT, LEFT, BOTH, Y, END
-from tkinter import messagebox
+from tkinter import Label, Button, Frame
 
 class ChatsWindow:
     last_page = 0
     def __init__(self, root, chats_ids, chat, page, main_menu, pages = None):
         self.window = root
-        self.log_img = PhotoImage(file = 'app/images/login.png')
-        self.window.title('My chats')
-        self.window.geometry('400x600')
-        self.window.configure(bg = "#fff")
-        self.window.resizable(False, False)
         self.chats_ids = chats_ids
         self.chat = chat
         self.page = page
@@ -51,4 +44,3 @@ class ChatsWindow:
             Button(frame, width = 10, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = self.pages[self.page - 1].draw).place(x = 25, y = y)
         if self.page != ChatsWindow.last_page:
              Button(frame, width = 17, pady = 7, text = 'Следущая страница', bg = '#57a1f8', fg = 'white', border = 0, command = self.pages[self.page + 1].draw).place(x = 220, y = y)
-        
