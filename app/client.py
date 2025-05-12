@@ -5,8 +5,8 @@ import requests
 from threading import Thread
 from time import sleep
 
-from ServerResponceHandler import ServerResponceHandler
-from ChatsWindow import ChatsWindow
+from workTools.ServerResponceHandler import ServerResponceHandler
+from workTools.ChatsWindow import ChatsWindow
 
 root = Tk()
 log_img = PhotoImage(file = 'app/images/login.png')
