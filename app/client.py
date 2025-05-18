@@ -7,6 +7,7 @@ from time import sleep
 
 from workTools.ServerResponceHandler import ServerResponceHandler
 from workTools.ChatsWindow import ChatsWindow
+from workTools.string_parser import parse_string
 
 root = Tk()
 log_img = PhotoImage(file = 'app/images/login.png')
@@ -148,7 +149,11 @@ def chat(user_chat):
     for i in range(len(message_mas)):
         login1 = login1_mas[i]
         message = message_mas[i]
-        msg_list.insert(END, f'{login1} : {message}')
+        rows = parse_string(message, login1)
+        msg_list.insert(END, f'{login1} : {rows[0]}')
+        if len(rows) > 1:
+            for i in range(1, len(rows)):
+                msg_list.insert(END, f'{rows[i]}')
 
     msg_list.yview_scroll(number = len(message_mas), what = 'units')
     
@@ -167,8 +172,12 @@ def load_new_message(msg_list, user_chat):
         for i in range(len(message_mas)):
             login1 = login1_mas[i]
             message = message_mas[i]
+            rows = parse_string(message, login1)
             try:
-                msg_list.insert(END, f'{login1} : {message}')
+                msg_list.insert(END, f'{login1} : {rows[0]}')
+                if len(rows) > 1:
+                    for i in range(1, len(rows)):
+                        msg_list.insert(END, f'{rows[i]}')
                 msg_list.yview_scroll(number = 1, what = 'units')
             except:
                 flag = False
@@ -177,7 +186,11 @@ def send_message(message, msg_list, user_chat, entry_field):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat,
                                                                                      'text': message})
-    msg_list.insert(END, f'{login_password_id__array[0]} : {message}')
+    rows = parse_string(message, login_password_id__array[0])
+    msg_list.insert(END, f'{login_password_id__array[0]} : {rows[0]}')
+    if len(rows) > 1:
+        for i in range(1, len(rows)):
+            msg_list.insert(END, f'{rows[i]}')
     msg_list.yview_scroll(number = 1, what = 'units')
     entry_field.delete("1.0", END)
 
