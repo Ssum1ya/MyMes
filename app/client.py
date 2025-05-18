@@ -145,7 +145,7 @@ def chat(user_chat):
     Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 150)
 
     root.protocol("WM_DELETE_WINDOW")
-
+    #test
     for i in range(len(message_mas)):
         login1 = login1_mas[i]
         message = message_mas[i]
@@ -154,7 +154,7 @@ def chat(user_chat):
         if len(rows) > 1:
             for i in range(1, len(rows)):
                 msg_list.insert(END, f'{rows[i]}')
-
+    #test
     msg_list.yview_scroll(number = len(message_mas), what = 'units')
     
     loading_history_thread = Thread(target = lambda: load_new_message(msg_list, user_chat))
@@ -168,7 +168,7 @@ def load_new_message(msg_list, user_chat):
                                                                           'login2': login_password_id__array[0]})
         messages = request.content.decode()
         login1_mas, message_mas = ServerResponceHandler.message_handler(messages)
-        
+        #test
         for i in range(len(message_mas)):
             login1 = login1_mas[i]
             message = message_mas[i]
@@ -178,6 +178,7 @@ def load_new_message(msg_list, user_chat):
                 if len(rows) > 1:
                     for i in range(1, len(rows)):
                         msg_list.insert(END, f'{rows[i]}')
+            #test
                 msg_list.yview_scroll(number = 1, what = 'units')
             except:
                 flag = False
@@ -186,11 +187,14 @@ def send_message(message, msg_list, user_chat, entry_field):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat,
                                                                                      'text': message})
+    #test
     rows = parse_string(message, login_password_id__array[0])
+    print(rows)
     msg_list.insert(END, f'{login_password_id__array[0]} : {rows[0]}')
     if len(rows) > 1:
         for i in range(1, len(rows)):
             msg_list.insert(END, f'{rows[i]}')
+    #test
     msg_list.yview_scroll(number = 1, what = 'units')
     entry_field.delete("1.0", END)
 
