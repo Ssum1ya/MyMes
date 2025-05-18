@@ -122,6 +122,9 @@ def chat(user_chat):
     root.title(user_chat)
     root.geometry('400x600')
 
+    frame = Frame(root, width = 400, height = 400, bg = "white")
+    frame.place(x = 0, y = 400)
+
     login1_mas, message_mas = show_history_messages(user_chat)
         
     messages_frame = Frame(root)
@@ -133,14 +136,13 @@ def chat(user_chat):
     msg_list.pack()
     messages_frame.pack()
 
-    button_back = Button(text = 'Назад', command = main_menu)
-
     entry_field = Text(height=5, wrap="char")
     entry_field.pack()
 
-    send_button = Button(root, text = 'отправить', command = lambda: send_message(entry_field.get("1.0", END), msg_list, user_chat, entry_field))
-    button_back.pack()
-    send_button.pack()
+    Frame(frame, width = 400, height = 2, bg = 'black').place(x = 0, y = 90)
+    Button(frame, width = 39, pady = 7, text = 'Отправить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: send_message(entry_field.get("1.0", END), msg_list, user_chat, entry_field)).place(x = 55, y = 100)
+    Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 150)
+
     root.protocol("WM_DELETE_WINDOW")
 
     for i in range(len(message_mas)):
@@ -149,7 +151,7 @@ def chat(user_chat):
         msg_list.insert(END, f'{login1} : {message}')
 
     msg_list.yview_scroll(number = len(message_mas), what = 'units')
-
+    
     loading_history_thread = Thread(target = lambda: load_new_message(msg_list, user_chat))
     loading_history_thread.start()
 
@@ -167,9 +169,9 @@ def load_new_message(msg_list, user_chat):
             message = message_mas[i]
             try:
                 msg_list.insert(END, f'{login1} : {message}')
+                msg_list.yview_scroll(number = 1, what = 'units')
             except:
                 flag = False
-            msg_list.yview_scroll(number = 1, what = 'units')
 
 def send_message(message, msg_list, user_chat, entry_field):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
