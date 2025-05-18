@@ -8,6 +8,7 @@ from time import sleep
 from workTools.ServerResponceHandler import ServerResponceHandler
 from workTools.ChatsWindow import ChatsWindow
 from workTools.string_parser import parse_string
+from workTools.test_string_parser import split_message
 
 root = Tk()
 log_img = PhotoImage(file = 'app/images/login.png')
@@ -149,11 +150,11 @@ def chat(user_chat):
     for i in range(len(message_mas)):
         login1 = login1_mas[i]
         message = message_mas[i]
-        rows = parse_string(message, login1)
-        msg_list.insert(END, f'{login1} : {rows[0]}')
-        if len(rows) > 1:
-            for i in range(1, len(rows)):
-                msg_list.insert(END, f'{rows[i]}')
+        lines = split_message(message)
+        msg_list.insert(END, f'{login1} : {lines[0]}')
+        if len(lines) > 1:
+            for i in range(1, len(lines)):
+                msg_list.insert(END, f'{lines[i]}')
     #test
     msg_list.yview_scroll(number = len(message_mas), what = 'units')
     
@@ -172,12 +173,12 @@ def load_new_message(msg_list, user_chat):
         for i in range(len(message_mas)):
             login1 = login1_mas[i]
             message = message_mas[i]
-            rows = parse_string(message, login1)
+            lines = split_message(message)
             try:
-                msg_list.insert(END, f'{login1} : {rows[0]}')
-                if len(rows) > 1:
-                    for i in range(1, len(rows)):
-                        msg_list.insert(END, f'{rows[i]}')
+                msg_list.insert(END, f'{login1} : {lines[0]}')
+                if len(lines) > 1:
+                    for i in range(1, len(lines)):
+                        msg_list.insert(END, f'{lines[i]}')
             #test
                 msg_list.yview_scroll(number = 1, what = 'units')
             except:
@@ -188,12 +189,11 @@ def send_message(message, msg_list, user_chat, entry_field):
                                                                                      'login2': user_chat,
                                                                                      'text': message})
     #test
-    rows = parse_string(message, login_password_id__array[0])
-    print(rows)
-    msg_list.insert(END, f'{login_password_id__array[0]} : {rows[0]}')
-    if len(rows) > 1:
-        for i in range(1, len(rows)):
-            msg_list.insert(END, f'{rows[i]}')
+    lines = split_message(message)
+    msg_list.insert(END, f'{login_password_id__array[0]} : {lines[0]}')
+    if len(lines) > 1:
+        for i in range(1, len(lines)):
+            msg_list.insert(END, f'{lines[i]}')
     #test
     msg_list.yview_scroll(number = 1, what = 'units')
     entry_field.delete("1.0", END)
