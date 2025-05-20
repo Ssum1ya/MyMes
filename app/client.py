@@ -126,12 +126,9 @@ def chat(user_chat):
     root.configure(bg = "#fff")
     root.resizable(False, False)
 
-    v = Scrollbar(orient=VERTICAL)
-    canvas = Canvas(scrollregion=(0, 0, 4080, 4080), bg="white", yscrollcommand=v.set, height = 400)
-    v["command"] = canvas.yview
+    canvas = Canvas(bg="white", height = 400) 
 
     canvas.grid(column=0, row=0, sticky=(N,W,E,S))
-    v.grid(column=1, row=0, sticky=(N,S))
     root.grid_columnconfigure(0, weight=1)
     root.grid_rowconfigure(0, weight=1)
 
@@ -141,7 +138,6 @@ def chat(user_chat):
     frame.place(x = 0, y = 400)   
 
     entry_field = Text(height=5, wrap="char")
-    entry_field.grid(padx = 0, pady = 120)
 
     Frame(frame, width = 400, height = 2, bg = 'black').place(x = 0, y = 90)
     Button(frame, width = 39, pady = 7, text = 'Отправить', bg = '#57a1f8', fg = 'white', border = 0).place(x = 55, y = 100)
@@ -180,6 +176,12 @@ def chat(user_chat):
         y1 = y2 + 10
         y2 = y1 + 30
 
+    v = Scrollbar(orient=VERTICAL)
+    canvas['scrollregion'] = (0, 0, y2, y2)
+    canvas['yscrollcommand'] = v.set
+    v["command"] = canvas.yview
+    v.grid(column=1, row=0, sticky=(N,S))
+    entry_field.grid(padx = 0, pady = 120)
     #test
     canvas.yview_moveto(1)
     
