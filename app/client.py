@@ -17,12 +17,19 @@ reg_img = PhotoImage(file = 'app/images/reg.png')
 login_password_id__array = []
 thread_flag = True
 
+y1 = 50
+y2 = 80
+
 def clear():
     for widget in root.winfo_children():
     	widget.destroy()
 
 def main_menu():
+    global y1
+    global y2
     global thread_flag
+    y1 = 50
+    y2 = 80
     thread_flag = False
     clear()
 
@@ -140,7 +147,7 @@ def chat(user_chat):
     entry_field = Text(height=5, wrap="char")
 
     Frame(frame, width = 400, height = 2, bg = 'black').place(x = 0, y = 90)
-    Button(frame, width = 39, pady = 7, text = 'Отправить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: send_message(entry_field.get("1.0", END), canvas, y1, y2, user_chat, entry_field)).place(x = 55, y = 100)
+    Button(frame, width = 39, pady = 7, text = 'Отправить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: send_message(entry_field.get("1.0", END), canvas, user_chat, entry_field)).place(x = 55, y = 100)
     Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 150)
 
     root.protocol("WM_DELETE_WINDOW")
@@ -149,8 +156,9 @@ def chat(user_chat):
     canvas.create_text(0, 0, anchor = "nw", text='Цвет ваших сообщений', fill="#57a1f8", font=("Courier", 12)) 
     canvas.create_text(0, 15, anchor = "nw", text='Цвет - ' + user_chat, fill="#00FF00", font=("Courier", 12))
     canvas.create_text(100, 30, anchor = "nw", text='Начало переписки', fill="#000000", font=("Courier", 12))
-    y1 = 50 
-    y2 = 80
+
+    global y1 
+    global y2
     for i in range(len(message_mas)):
         login1 = login1_mas[i]
         message = message_mas[i]
@@ -211,13 +219,15 @@ def load_new_message(msg_list, user_chat):
             except:
                 flag = False
 
-def send_message(message, canvas, y1, y2, user_chat, entry_field):
+def send_message(message, canvas, user_chat, entry_field):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat,
                                                                                      'text': message})
     #test
     lines = [message[i:i+36] for i in range(0, len(message), 36)]
     x_canvas = 375
+    global y1
+    global y2
 
     if len(lines) > 1:
         y2 += 12 * len(lines) - 1
@@ -237,7 +247,6 @@ def send_message(message, canvas, y1, y2, user_chat, entry_field):
     canvas['scrollregion'] = (0, 0, y2, y2)
     canvas.yview_moveto(1)
     entry_field.delete("1.0", END)
-    chat(user_chat)
 
 def show_history_messages(user_chat):
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
