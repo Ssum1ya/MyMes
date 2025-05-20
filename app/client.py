@@ -7,8 +7,6 @@ from time import sleep
 
 from workTools.ServerResponceHandler import ServerResponceHandler
 from workTools.ChatsWindow import ChatsWindow
-from workTools.string_parser import parse_string
-from workTools.test_string_parser import split_message_by_words
 
 root = Tk()
 log_img = PhotoImage(file = 'app/images/login.png')
