@@ -193,10 +193,12 @@ def chat(user_chat):
     #test
     canvas.yview_moveto(1)
     
-    # loading_history_thread = Thread(target = lambda: load_new_message(msg_list, user_chat))
-    # loading_history_thread.start()
+    loading_history_thread = Thread(target = lambda: load_new_message(canvas, user_chat))
+    loading_history_thread.start()
 
-def load_new_message(msg_list, user_chat):
+def load_new_message(canvas, user_chat):
+    global y1 
+    global y2
     flag = True              
     while flag and thread_flag:
         sleep(5)
@@ -208,14 +210,31 @@ def load_new_message(msg_list, user_chat):
         for i in range(len(message_mas)):
             login1 = login1_mas[i]
             message = message_mas[i]
-            lines = split_message(message)
+            lines = [message[i:i+36] for i in range(0, len(message), 36)]
             try:
-                msg_list.insert(END, f'{login1} : {lines[0]}')
+                x_canvas = 375
+
                 if len(lines) > 1:
-                    for i in range(1, len(lines)):
-                        msg_list.insert(END, f'{lines[i]}')
+                    y2 += 12 * len(lines) - 1
+                if len(lines) == 1 and len(lines[0]) < 36:
+                    x_canvas -= 10 * (36 - len(lines[0]))
+
+                if login1 == login_password_id__array[0]:
+                    canvas.create_rectangle(5, y1, x_canvas, y2, fill="#57a1f8", outline="#000000") #375 #57a1f8 #00FF00 #000F4D
+                else:
+                    canvas.create_rectangle(5, y1, x_canvas, y2, fill="#00FF00", outline="#000000")
+
+                y1_string = y1 + 5
+                for i in lines:
+                    canvas.create_text(10, y1_string, anchor = "nw", text=i, fill="#004D40", font=("Courier", 12))
+                    y1_string += 15
+
+                y1 = y2 + 10
+                y2 = y1 + 30
+
+                canvas['scrollregion'] = (0, 0, y2, y2)
+                canvas.yview_moveto(1)
             #test
-                msg_list.yview_scroll(number = 1, what = 'units')
             except:
                 flag = False
 
