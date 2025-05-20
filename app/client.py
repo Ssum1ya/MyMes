@@ -140,7 +140,7 @@ def chat(user_chat):
     entry_field = Text(height=5, wrap="char")
 
     Frame(frame, width = 400, height = 2, bg = 'black').place(x = 0, y = 90)
-    Button(frame, width = 39, pady = 7, text = 'Отправить', bg = '#57a1f8', fg = 'white', border = 0).place(x = 55, y = 100)
+    Button(frame, width = 39, pady = 7, text = 'Отправить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: send_message(entry_field.get("1.0", END), canvas, y1, y2, user_chat, entry_field)).place(x = 55, y = 100)
     Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 150)
 
     root.protocol("WM_DELETE_WINDOW")
@@ -211,19 +211,33 @@ def load_new_message(msg_list, user_chat):
             except:
                 flag = False
 
-def send_message(message, msg_list, user_chat, entry_field):
+def send_message(message, canvas, y1, y2, user_chat, entry_field):
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat,
                                                                                      'text': message})
     #test
-    lines = split_message(message)
-    msg_list.insert(END, f'{login_password_id__array[0]} : {lines[0]}')
+    lines = [message[i:i+36] for i in range(0, len(message), 36)]
+    x_canvas = 375
+
     if len(lines) > 1:
-        for i in range(1, len(lines)):
-            msg_list.insert(END, f'{lines[i]}')
+        y2 += 12 * len(lines) - 1
+    if len(lines) == 1 and len(lines[0]) < 36:
+        x_canvas -= 10 * (36 - len(lines[0]))
+
+    canvas.create_rectangle(5, y1, x_canvas, y2, fill="#57a1f8", outline="#000000")
+
+    y1_string = y1 + 5
+    for i in lines:
+        canvas.create_text(10, y1_string, anchor = "nw", text=i, fill="#004D40", font=("Courier", 12))
+        y1_string += 15
+
+    y1 = y2 + 10
+    y2 = y1 + 30
     #test
-    msg_list.yview_scroll(number = 1, what = 'units')
+    canvas['scrollregion'] = (0, 0, y2, y2)
+    canvas.yview_moveto(1)
     entry_field.delete("1.0", END)
+    chat(user_chat)
 
 def show_history_messages(user_chat):
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
