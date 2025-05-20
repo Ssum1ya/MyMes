@@ -35,7 +35,7 @@ for string in strings:
     if len(lines) == 1 and len(lines[0]) < 36:
         x_canvas -= 10 * (36 - len(lines[0]))
 
-    canvas.create_rectangle(5, y1, x_canvas, y2, fill="#80CBC4", outline="#004D40") #375
+    canvas.create_rectangle(5, y1, x_canvas, y2, fill="#57a1f8", outline="#000F4D") #375 #57a1f8 #00FF00
 
     y1_string = y1 + 5
     for i in lines:

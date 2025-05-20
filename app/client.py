@@ -1,5 +1,5 @@
-from tkinter import Tk, Label, Button, Entry, Listbox, Frame, Scrollbar, Text, PhotoImage
-from tkinter import RIGHT, LEFT, BOTH, Y, END
+from tkinter import Tk, Label, Button, Entry, Listbox, Frame, Scrollbar, Text, PhotoImage, Canvas
+from tkinter import RIGHT, LEFT, BOTH, Y, END, VERTICAL, N, W, E, S
 from tkinter import messagebox
 import requests
 from threading import Thread
@@ -8,7 +8,7 @@ from time import sleep
 from workTools.ServerResponceHandler import ServerResponceHandler
 from workTools.ChatsWindow import ChatsWindow
 from workTools.string_parser import parse_string
-from workTools.test_string_parser import split_message
+from workTools.test_string_parser import split_message_by_words
 
 root = Tk()
 log_img = PhotoImage(file = 'app/images/login.png')
@@ -123,43 +123,68 @@ def chat(user_chat):
     clear()
     root.title(user_chat)
     root.geometry('400x600')
+    root.configure(bg = "#fff")
+    root.resizable(False, False)
 
-    frame = Frame(root, width = 400, height = 400, bg = "white")
-    frame.place(x = 0, y = 400)
+    v = Scrollbar(orient=VERTICAL)
+    canvas = Canvas(scrollregion=(0, 0, 4080, 4080), bg="white", yscrollcommand=v.set, height = 400)
+    v["command"] = canvas.yview
 
-    login1_mas, message_mas = show_history_messages(user_chat)
-        
-    messages_frame = Frame(root)
-    scrollbar = Scrollbar(messages_frame)
+    canvas.grid(column=0, row=0, sticky=(N,W,E,S))
+    v.grid(column=1, row=0, sticky=(N,S))
+    root.grid_columnconfigure(0, weight=1)
+    root.grid_rowconfigure(0, weight=1)
 
-    msg_list = Listbox(messages_frame, height = 25, width = 70, yscrollcommand = scrollbar.set)
-    scrollbar.pack(side = RIGHT, fill = Y)
-    msg_list.pack(side = LEFT, fill = BOTH)
-    msg_list.pack()
-    messages_frame.pack()
+    canvas.place(x = 0, y = 0)
+
+    frame = Frame(root, width = 380, height = 400, bg = "white")
+    frame.place(x = 0, y = 400)   
 
     entry_field = Text(height=5, wrap="char")
-    entry_field.pack()
+    entry_field.grid(padx = 0, pady = 120)
 
     Frame(frame, width = 400, height = 2, bg = 'black').place(x = 0, y = 90)
-    Button(frame, width = 39, pady = 7, text = 'Отправить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: send_message(entry_field.get("1.0", END), msg_list, user_chat, entry_field)).place(x = 55, y = 100)
+    Button(frame, width = 39, pady = 7, text = 'Отправить', bg = '#57a1f8', fg = 'white', border = 0).place(x = 55, y = 100)
     Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 150)
 
     root.protocol("WM_DELETE_WINDOW")
+    login1_mas, message_mas = show_history_messages(user_chat)
     #test
+    canvas.create_text(0, 0, anchor = "nw", text='Цвет ваших сообщений', fill="#57a1f8", font=("Courier", 12)) 
+    canvas.create_text(0, 15, anchor = "nw", text='Цвет - ' + user_chat, fill="#00FF00", font=("Courier", 12))
+    canvas.create_text(100, 30, anchor = "nw", text='Начало переписки', fill="#000000", font=("Courier", 12))
+    y1 = 50 
+    y2 = 80
     for i in range(len(message_mas)):
         login1 = login1_mas[i]
         message = message_mas[i]
-        lines = split_message(message)
-        msg_list.insert(END, f'{login1} : {lines[0]}')
+        lines = [message[i:i+36] for i in range(0, len(message), 36)]
+        print(lines)
+        x_canvas = 375
+
         if len(lines) > 1:
-            for i in range(1, len(lines)):
-                msg_list.insert(END, f'{lines[i]}')
+            y2 += 12 * len(lines) - 1
+        if len(lines) == 1 and len(lines[0]) < 36:
+            x_canvas -= 10 * (36 - len(lines[0]))
+
+        if login1 == login_password_id__array[0]:
+            canvas.create_rectangle(5, y1, x_canvas, y2, fill="#57a1f8", outline="#000000") #375 #57a1f8 #00FF00 #000F4D
+        else:
+            canvas.create_rectangle(5, y1, x_canvas, y2, fill="#00FF00", outline="#000000")
+
+        y1_string = y1 + 5
+        for i in lines:
+            canvas.create_text(10, y1_string, anchor = "nw", text=i, fill="#004D40", font=("Courier", 12))
+            y1_string += 15
+
+        y1 = y2 + 10
+        y2 = y1 + 30
+
     #test
-    msg_list.yview_scroll(number = len(message_mas), what = 'units')
+    canvas.yview_moveto(1)
     
-    loading_history_thread = Thread(target = lambda: load_new_message(msg_list, user_chat))
-    loading_history_thread.start()
+    # loading_history_thread = Thread(target = lambda: load_new_message(msg_list, user_chat))
+    # loading_history_thread.start()
 
 def load_new_message(msg_list, user_chat):
     flag = True              
