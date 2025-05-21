@@ -49,6 +49,7 @@ def login():
 
         cursor.close()
         db.close()
+
         if len(user_coincidences) == 0:
             return 'Denied'
         else:  
@@ -114,7 +115,7 @@ def add_perwon2chats():
 
                 insert_data = (responce['chat'],  responce['login'])
                 cursor.execute(insert_chat, insert_data)
-                
+
                 db.commit()
             else:
                 return 'Denied'
@@ -153,13 +154,10 @@ def get_users():
 def get_new_messages():
     if request.method == 'POST':
         responce = request.get_json()
-
         db = get_db_connection()
         cursor = db.cursor()
-        try:
-            cursor.execute(select_new_message_id, (responce['login1'], responce['login2'],))
-        except mysql.connector.errors.InterfaceError as e:
-            print("Ошибка работы с MySQL:", e)
+
+        cursor.execute(select_new_message_id, (responce['login1'], responce['login2'],))
         new_ids = cursor.fetchall()
         new_ids_array = []
         for i in range(len(new_ids)):
@@ -173,9 +171,9 @@ def get_new_messages():
 
         cursor.execute(delete_new_message, (responce['login1'], responce['login2'])) # multi = True
         db.commit()
+        
         cursor.close()
         db.close()
-
         return new_messages_array
     else:
         return 'no request'
@@ -198,6 +196,7 @@ def get_history():
             tmp_array.append(messages[i][0])
             tmp_array.append(messages[i][1])
             messages_array.append(tmp_array)
+
         cursor.close()
         db.close()
         return messages_array
@@ -208,19 +207,18 @@ def get_history():
 def send_message():
     if request.method == 'POST':
         responce = request.get_json()
-
         db = get_db_connection()
         cursor = db.cursor()
 
-        try:
-            cursor.execute(select_message_lastId)
-        except mysql.connector.errors.InterfaceError as e:
-            print("Ошибка работы с MySQL:", e)
+        cursor.execute(select_message_lastId)
         last_id = cursor.fetchone()
+
         message = (last_id[0] + 1, responce['login1'],  responce['login2'], responce['text'])
         new_message = (last_id[0] + 1, responce['login1'], responce['login2'])
+
         cursor.execute(insert_message, message)
         cursor.execute(insert_new_message, new_message)
+
         db.commit()
         cursor.close()
         db.close()
