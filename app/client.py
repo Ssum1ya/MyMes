@@ -50,8 +50,6 @@ def show_my_chats():
     clear()
     root.title('My chats')
     root.geometry('400x600')
-    root.configure(bg = "#fff")
-    root.resizable(False, False)
 
     frame = Frame(root, width = 350, height = 600, bg = "white")
     frame.place(x = 0, y = 0)
@@ -61,9 +59,7 @@ def show_my_chats():
 
     request = requests.post('http://127.0.0.1:5000/users', json = {'login': login_password_id__array[0]})
     chats = request.content.decode()
-
     chats_mas, ids_mas = ServerResponceHandler.chats_handler(chats)
-
     chats_mas_split = [chats_mas[i:i+9] for i in range(0, len(chats_mas), 9)]
     ids_mas_split = [ids_mas[i:i+9] for i in range(0, len(ids_mas), 9)]
     
@@ -83,8 +79,6 @@ def add_person2chats():
     clear()
     root.title('Add person to my chats')
     root.geometry('400x250')
-    root.configure(bg = "#fff")
-    root.resizable(False, False)
 
     frame = Frame(root, width = 400, height = 400, bg = "white")
     frame.place(x = 0, y = 0)
@@ -103,6 +97,7 @@ def add_person2chats():
     Button(frame, width = 39, pady = 7, text = 'Добавить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda : check_login_in_bd(person_login.get(), )).place(x = 55, y = 157)
     Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 207)
 
+# TODO: вынести в отдельный файл
 def check_login_in_bd(user_login):
     request = requests.post('http://127.0.0.1:5000/add_person2chats', json = {'chat': user_login,
                                                                               'login': login_password_id__array[0]})
@@ -128,15 +123,11 @@ def chat(user_chat):
     clear()
     root.title(user_chat)
     root.geometry('400x600')
-    root.configure(bg = "#fff")
-    root.resizable(False, False)
 
     canvas = Canvas(bg="white", height = 400) 
-
     canvas.grid(column=0, row=0, sticky=(N,W,E,S))
     root.grid_columnconfigure(0, weight=1)
     root.grid_rowconfigure(0, weight=1)
-
     canvas.place(x = 0, y = 0)
 
     frame = Frame(root, width = 380, height = 400, bg = "white")
@@ -265,6 +256,7 @@ def send_message(message, canvas, user_chat, entry_field):
     canvas.yview_moveto(1)
     entry_field.delete("1.0", END)
 
+# TODO: вынести в отдельный файл
 def show_history_messages(user_chat):
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat})
@@ -311,6 +303,7 @@ def login():
     sign_up = Button(frame, width = 19, text = 'Зарегистрироваться', border = 0, bg = 'white', cursor = 'hand2', fg = '#57a1f8', command = registration)
     sign_up.place(x = 165, y = 270)
 
+# TODO: вынести в отдельный файл
 def reg(user_login, password1, password2):
     if password1 != password2:
         messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как пароли не совпадают')
@@ -332,8 +325,6 @@ def registration():
     clear()
     root.title('Registration')
     root.geometry('925x500+300+200')
-    root.configure(bg = "#fff")
-    root.resizable(False, False)
 
     Label(root, image = reg_img, bg = 'white').place(x = 50, y = 50)
 
@@ -367,7 +358,6 @@ def registration():
 
     Frame(frame, width = 295, height = 2, bg = 'black').place(x = 25, y = 247)
     
-
     Button(frame, width = 39, pady = 7, text = 'Зарегестрироваться', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: reg(user.get(), code.get(), conform_code.get())).place(x = 35, y = 280)
     label = Label(frame, text = "Уже есть учетная запись?", fg = 'black', bg = 'white', font = ('Microsoft YaHei UI Light', 9))
     label.place(x = 40, y = 320)
@@ -375,6 +365,7 @@ def registration():
     sign_up = Button(frame, width = 5, text = 'Войти', border = 0, bg = 'white', cursor = 'hand2', fg = '#57a1f8', command = login)
     sign_up.place(x = 200, y = 320)
 
+# TODO: вынести в отдельный файл
 def log(user_login, user_password):
     request = requests.post('http://127.0.0.1:5000/login', json = {'login': user_login,
                                                          'password': user_password})
