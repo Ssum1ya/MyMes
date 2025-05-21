@@ -199,7 +199,7 @@ def load_new_message(canvas, user_chat):
     global y2
     flag = True              
     while flag and thread_flag:
-        sleep(5)
+        sleep(2)
         request = requests.post('http://127.0.0.1:5000/get_new_messages', json = {'login1' : user_chat, 
                                                                           'login2': login_password_id__array[0]})
         messages = request.content.decode()
