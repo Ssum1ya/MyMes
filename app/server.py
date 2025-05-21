@@ -3,14 +3,24 @@ import mysql.connector
 
 import databaseTools.database_config as cfg
 
-my_db = mysql.connector.connect(
-    host = cfg.HOST,
-    user = cfg.USER,
-    auth_plugin = cfg.AUTH_PLAGIN,
-    passwd = cfg.PASSWORD,
-    database = cfg.DATABASE
-)
-my_cursor = my_db.cursor()
+# my_db = mysql.connector.connect(
+#     host = cfg.HOST,
+#     user = cfg.USER,
+#     auth_plugin = cfg.AUTH_PLAGIN,
+#     passwd = cfg.PASSWORD,
+#     database = cfg.DATABASE
+# )
+
+def get_db_connection():
+    return mysql.connector.connect(
+        host = cfg.HOST,
+        user = cfg.USER,
+        auth_plugin = cfg.AUTH_PLAGIN,
+        passwd = cfg.PASSWORD,
+        database = cfg.DATABASE
+    )
+
+# my_cursor = my_db.cursor()
 insert_reg = 'INSERT INTO users (id, login, password) VALUES (%s, %s, %s)'
 insert_chat = 'INSERT INTO chats (login, chat) VALUES (%s, %s)'
 select_last_id =  'SELECT id FROM users ORDER BY id DESC LIMIT 1'
@@ -40,6 +50,7 @@ def get_db_connection():
 def login():
     if request.method == 'POST':
         responce = request.get_json()
+        
         my_cursor.execute(check_login_password, (responce['login'], responce['password'],))
         user_coincidences = my_cursor.fetchall()
         if len(user_coincidences) == 0:
