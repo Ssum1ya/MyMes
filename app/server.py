@@ -27,6 +27,15 @@ select_new_message = 'SELECT login1, text FROM messages WHERE messageId = %s'
 
 app = Flask("server")
 
+def get_db_connection():
+    return mysql.connector.connect(
+        host = cfg.HOST,
+        user = cfg.USER,
+        auth_plugin = cfg.AUTH_PLAGIN,
+        passwd = cfg.PASSWORD,
+        database = cfg.DATABASE
+    )
+
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -120,20 +129,27 @@ def get_new_messages():
     if request.method == 'POST':
         responce = request.get_json()
 
-        my_cursor.execute(select_new_message_id, (responce['login1'], responce['login2'],))
-        new_ids = my_cursor.fetchall()
+        db = get_db_connection()
+        cursor = db.cursor()
+        try:
+            cursor.execute(select_new_message_id, (responce['login1'], responce['login2'],))
+        except mysql.connector.errors.InterfaceError as e:
+            print("Ошибка работы с MySQL:", e)
+        new_ids = cursor.fetchall()
         new_ids_array = []
         for i in range(len(new_ids)):
             new_ids_array.append(new_ids[i][0])
 
         new_messages_array = []
         for i in range(len(new_ids_array)):
-            my_cursor.execute(select_new_message, (new_ids_array[i],))
-            login1_text = my_cursor.fetchall()
+            cursor.execute(select_new_message, (new_ids_array[i],))
+            login1_text = cursor.fetchall()
             new_messages_array.append([login1_text[0][0], login1_text[0][1]])
 
-        my_cursor.execute(delete_new_message, (responce['login1'], responce['login2'])) # multi = True
-        my_db.commit()
+        cursor.execute(delete_new_message, (responce['login1'], responce['login2'])) # multi = True
+        db.commit()
+        cursor.close()
+        db.close()
 
         return new_messages_array
     else:
@@ -164,13 +180,21 @@ def send_message():
     if request.method == 'POST':
         responce = request.get_json()
 
-        my_cursor.execute(select_message_lastId)
-        last_id = my_cursor.fetchone()
+        db = get_db_connection()
+        cursor = db.cursor()
+
+        try:
+            cursor.execute(select_message_lastId)
+        except mysql.connector.errors.InterfaceError as e:
+            print("Ошибка работы с MySQL:", e)
+        last_id = cursor.fetchone()
         message = (last_id[0] + 1, responce['login1'],  responce['login2'], responce['text'])
         new_message = (last_id[0] + 1, responce['login1'], responce['login2'])
-        my_cursor.execute(insert_message, message)
-        my_cursor.execute(insert_new_message, new_message)
-        my_db.commit()
+        cursor.execute(insert_message, message)
+        cursor.execute(insert_new_message, new_message)
+        db.commit()
+        cursor.close()
+        db.close()
         return 'Success'
     else:
         return 'no request'
