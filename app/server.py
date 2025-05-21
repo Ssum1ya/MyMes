@@ -46,6 +46,7 @@ def login():
 
         cursor.execute(check_login_password, (responce['login'], responce['password'],))
         user_coincidences = cursor.fetchall()
+
         cursor.close()
         db.close()
         if len(user_coincidences) == 0:
@@ -62,27 +63,24 @@ def registration():
         db = get_db_connection()
         cursor = db.cursor()
 
-        cursor.execute(select_last_id)
-        last_id = cursor.fetchone()
+        try:
+            cursor.execute(select_last_id)
+            last_id = cursor.fetchone()
 
-        cursor.execute(check_login_for_registration, (responce['login'],)) 
-        login_coincidences = cursor.fetchall()
-        if len(login_coincidences) != 0:
+            cursor.execute(check_login_for_registration, (responce['login'],)) 
+            login_coincidences = cursor.fetchall()
+            if len(login_coincidences) != 0:
+                return 'Denied' 
+            else:
+                user = (last_id[0] + 1, responce['login'],  responce['password'])
+                try:
+                    cursor.execute(insert_reg, user)
+                except:
+                    return 'Denied long login'
+                db.commit()
+        finally:
             cursor.close()
             db.close()
-            return 'Denied' 
-        else:
-            user = (last_id[0] + 1, responce['login'],  responce['password'])
-            try:
-                cursor.execute(insert_reg, user)
-            except:
-                cursor.close()
-                db.close()
-                return 'Denied long login'
-            db.commit()
-
-        cursor.close()
-        db.close()
         return 'Success'
     else:
         return 'no request'
@@ -94,39 +92,35 @@ def add_perwon2chats():
         db = get_db_connection()
         cursor = db.cursor()
 
-        if responce['chat'] == '':
-            cursor.close()
-            db.close()
-            return 'Denied empty string'
-        
-        cursor.execute(select_chats, (responce['login'],))
-        chats = cursor.fetchall()
-        chats_array = []
-        for i in range(len(chats)):
-            chats_array.append(chats[i][0])
-        if responce['chat'] in chats_array:
-            cursor.close()
-            db.close()
-            return 'Denied already in chats'
+        try:
+            if responce['chat'] == '':
+                return 'Denied empty string'
+            
+            cursor.execute(select_chats, (responce['login'],))
+            chats = cursor.fetchall()
+            chats_array = []
+            for i in range(len(chats)):
+                chats_array.append(chats[i][0])
+            if responce['chat'] in chats_array:
+                return 'Denied already in chats'
 
-        cursor.execute(check_login_for_registration, (responce['chat'],)) 
-        login_coincidences = cursor.fetchall()
-        if responce['login'] == responce['chat']:
+            cursor.execute(check_login_for_registration, (responce['chat'],)) 
+            login_coincidences = cursor.fetchall()
+            if responce['login'] == responce['chat']:
+                return 'Denied login equals chat'
+            elif len(login_coincidences) != 0:
+                insert_data = (responce['login'],  responce['chat'])
+                cursor.execute(insert_chat, insert_data)
+
+                insert_data = (responce['chat'],  responce['login'])
+                cursor.execute(insert_chat, insert_data)
+                
+                db.commit()
+            else:
+                return 'Denied'
+        finally:
             cursor.close()
             db.close()
-            return 'Denied login equals chat'
-        elif len(login_coincidences) != 0:
-            insert_data = (responce['login'],  responce['chat'])
-            cursor.execute(insert_chat, insert_data)
-            insert_data = (responce['chat'],  responce['login'])
-            cursor.execute(insert_chat, insert_data)
-            db.commit()
-        else:
-            cursor.close()
-            db.close()
-            return 'Denied'
-        cursor.close()
-        db.close()
         return 'Success'
     else:
         return 'no request'
