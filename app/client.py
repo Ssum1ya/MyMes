@@ -7,6 +7,7 @@ from time import sleep
 
 from workTools.ServerResponceHandler import ServerResponceHandler
 from workTools.ChatsWindow import ChatsWindow
+from workTools.ChatLoadingMessage import ChatLoadingMessage
 
 root = Tk()
 log_img = PhotoImage(file = 'app/images/login.png')
@@ -141,7 +142,7 @@ def chat(user_chat):
 
     root.protocol("WM_DELETE_WINDOW")
     login1_mas, message_mas = show_history_messages(user_chat)
-    #test
+
     canvas.create_text(0, 0, anchor = "nw", text='Цвет ваших сообщений', fill="#57a1f8", font=("Courier", 12)) 
     canvas.create_text(0, 15, anchor = "nw", text='Цвет - ' + user_chat, fill="#00FF00", font=("Courier", 12))
     canvas.create_text(100, 30, anchor = "nw", text='Начало переписки', fill="#000000", font=("Courier", 12))
@@ -151,24 +152,7 @@ def chat(user_chat):
     for i in range(len(message_mas)):
         login1 = login1_mas[i]
         message = message_mas[i]
-        lines = [message[i:i+36] for i in range(0, len(message), 36)]
-        print(lines)
-        x_canvas = 375
-
-        if len(lines) > 1:
-            y2 += 12 * len(lines) - 1
-        if len(lines) == 1 and len(lines[0]) < 36:
-            x_canvas -= 10 * (36 - len(lines[0]))
-
-        if login1 == login_password_id__array[0]:
-            canvas.create_rectangle(5, y1, x_canvas, y2, fill="#57a1f8", outline="#000000") #375 #57a1f8 #00FF00 #000F4D
-        else:
-            canvas.create_rectangle(5, y1, x_canvas, y2, fill="#00FF00", outline="#000000")
-
-        y1_string = y1 + 5
-        for i in lines:
-            canvas.create_text(10, y1_string, anchor = "nw", text=i, fill="#004D40", font=("Courier", 12))
-            y1_string += 15
+        y1, y2 = ChatLoadingMessage.load_message(canvas, login1, message, y1, y2, login_password_id__array[0])
 
         y1 = y2 + 10
         y2 = y1 + 30
@@ -179,7 +163,7 @@ def chat(user_chat):
     v["command"] = canvas.yview
     v.grid(column=1, row=0, sticky=(N,S))
     entry_field.grid(padx = 0, pady = 120)
-    #test
+
     canvas.yview_moveto(1)
     
     loading_history_thread = Thread(target = lambda: load_new_message(canvas, user_chat))
@@ -195,47 +179,29 @@ def load_new_message(canvas, user_chat):
                                                                           'login2': login_password_id__array[0]})
         messages = request.content.decode()
         login1_mas, message_mas = ServerResponceHandler.message_handler(messages)
-        #test
+
         for i in range(len(message_mas)):
             login1 = login1_mas[i]
             message = message_mas[i]
-            lines = [message[i:i+36] for i in range(0, len(message), 36)]
             try:
-                x_canvas = 375
-
-                if len(lines) > 1:
-                    y2 += 12 * len(lines) - 1
-                if len(lines) == 1 and len(lines[0]) < 36:
-                    x_canvas -= 10 * (36 - len(lines[0]))
-
-                if login1 == login_password_id__array[0]:
-                    canvas.create_rectangle(5, y1, x_canvas, y2, fill="#57a1f8", outline="#000000") #375 #57a1f8 #00FF00 #000F4D
-                else:
-                    canvas.create_rectangle(5, y1, x_canvas, y2, fill="#00FF00", outline="#000000")
-
-                y1_string = y1 + 5
-                for i in lines:
-                    canvas.create_text(10, y1_string, anchor = "nw", text=i, fill="#004D40", font=("Courier", 12))
-                    y1_string += 15
+                y1, y2 = ChatLoadingMessage.load_message(canvas, login1, message, y1, y2, login_password_id__array[0])
 
                 y1 = y2 + 10
                 y2 = y1 + 30
 
                 canvas['scrollregion'] = (0, 0, y2, y2)
                 canvas.yview_moveto(1)
-            #test
             except:
                 flag = False
 
 def send_message(message, canvas, user_chat, entry_field):
+    global y1
+    global y2
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat,
                                                                                      'text': message})
-    #test
     lines = [message[i:i+36] for i in range(0, len(message), 36)]
     x_canvas = 375
-    global y1
-    global y2
 
     if len(lines) > 1:
         y2 += 12 * len(lines) - 1
@@ -251,9 +217,10 @@ def send_message(message, canvas, user_chat, entry_field):
 
     y1 = y2 + 10
     y2 = y1 + 30
-    #test
+
     canvas['scrollregion'] = (0, 0, y2, y2)
     canvas.yview_moveto(1)
+
     entry_field.delete("1.0", END)
 
 # TODO: вынести в отдельный файл
