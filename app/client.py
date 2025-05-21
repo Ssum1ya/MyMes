@@ -1,5 +1,5 @@
-from tkinter import Tk, Label, Button, Entry, Listbox, Frame, Scrollbar, Text, PhotoImage, Canvas
-from tkinter import RIGHT, LEFT, BOTH, Y, END, VERTICAL, N, W, E, S
+from tkinter import Tk, Label, Button, Entry, Frame, Scrollbar, Text, PhotoImage, Canvas
+from tkinter import END, VERTICAL, N, W, E, S
 from tkinter import messagebox
 import requests
 from threading import Thread
