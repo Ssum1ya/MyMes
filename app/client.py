@@ -45,7 +45,7 @@ def main_menu():
     heading.place(x = 90, y = 10)
 
     Button(frame, width = 39, pady = 7, text = 'Мои чаты', bg = '#57a1f8', fg = 'white', border = 0,command = lambda: show_my_chats()).place(x = 65, y = 80)
-    Button(frame, width = 39, pady = 7, text = 'Добавить человека в чаты', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: add_person2chats()).place(x = 65, y = 130)
+    Button(frame, width = 39, pady = 7, text = 'Добавить пользователя в чаты', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: add_person2chats()).place(x = 65, y = 130)
     Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = login).place(x = 65, y = 180)
 
 def show_my_chats():
@@ -85,11 +85,11 @@ def add_person2chats():
     frame = Frame(root, width = 400, height = 400, bg = "white")
     frame.place(x = 0, y = 0)
 
-    heading = Label(frame, text = 'Добавить человека в мои чаты', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 18, 'bold'))
-    heading.place(x = 5, y = 10)
+    heading = Label(frame, text = 'Добавить пользователя', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 18, 'bold'))
+    heading.place(x = 50, y = 10)
 
-    heading = Label(frame, text = 'Введите логин того кого хотите добавить в чаты', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 11, 'bold'))
-    heading.place(x = 0, y = 60)
+    heading = Label(frame, text = 'Введите логин', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 15, 'bold'))
+    heading.place(x = 40, y = 60)
 
     person_login = Entry(frame, width = 40, fg = 'black', border = 0, bg = "white", font = ('Microsoft YaHei UI Light', 11), )
     person_login.place(x = 45, y = 100)
