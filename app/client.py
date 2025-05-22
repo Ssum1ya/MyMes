@@ -8,6 +8,7 @@ from time import sleep
 from workTools.ServerResponceHandler import ServerResponceHandler
 from workTools.ChatsWindow import ChatsWindow
 from workTools.ChatLoadingMessage import ChatLoadingMessage
+from workTools.MessageHandler import MessageHandler
 
 root = Tk()
 log_img = PhotoImage(file = 'app/images/login.png')
@@ -197,32 +198,51 @@ def load_new_message(canvas, user_chat):
 def send_message(message, canvas, user_chat, entry_field):
     global y1
     global y2
-    request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
-                                                                                     'login2': user_chat,
-                                                                                     'text': message})
-    lines = [message[i:i+36] for i in range(0, len(message), 36)]
-    x_canvas = 375
 
-    if len(lines) > 1:
-        y2 += 12 * len(lines) - 1
-    if len(lines) == 1 and len(lines[0]) < 36:
-        x_canvas -= 10 * (36 - len(lines[0]))
+    message = MessageHandler.handle_message(message.strip())
+    answer = MessageHandler.check_spaces(message)
 
-    canvas.create_rectangle(5, y1, x_canvas, y2, fill="#57a1f8", outline="#000000")
+    if answer == 'Denied':
+        messagebox.showinfo('Отклонено', 'Ваще сообщение состоит из пробелов')
+    else:
+        message = message.strip()
+        request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
+                                                                                        'login2': user_chat,
+                                                                                        'text': message})
+        check = check_message(request.content)
+        if check == 'Success':
+            lines = [message[i:i+36] for i in range(0, len(message), 36)]
+            x_canvas = 375
 
-    y1_string = y1 + 5
-    for i in lines:
-        canvas.create_text(10, y1_string, anchor = "nw", text=i, fill="#004D40", font=("Courier", 12))
-        y1_string += 15
+            if len(lines) > 1:
+                y2 += 12 * len(lines) - 1
+            if len(lines) == 1 and len(lines[0]) < 36:
+                x_canvas -= 10 * (36 - len(lines[0]))
 
-    y1 = y2 + 10
-    y2 = y1 + 30
+            canvas.create_rectangle(5, y1, x_canvas, y2, fill="#57a1f8", outline="#000000")
 
-    canvas['scrollregion'] = (0, 0, y2, y2)
-    canvas.yview_moveto(1)
+            y1_string = y1 + 5
+            for i in lines:
+                canvas.create_text(10, y1_string, anchor = "nw", text=i, fill="#004D40", font=("Courier", 12))
+                y1_string += 15
 
-    entry_field.delete("1.0", END)
+            y1 = y2 + 10
+            y2 = y1 + 30
 
+            canvas['scrollregion'] = (0, 0, y2, y2)
+            canvas.yview_moveto(1)
+
+            entry_field.delete("1.0", END)
+
+# TODO: вынести в отдельный файл
+def check_message(server_answer):
+    if server_answer == b'Denied empty message':
+        messagebox.showinfo('Отклонено', 'Ваще сообщение путстое')
+    elif server_answer == b'Denied long message':
+        messagebox.showinfo('Отклонено', 'Слишком большое сообщение')
+    else:
+        return 'Success'
+    
 # TODO: вынести в отдельный файл
 def show_history_messages(user_chat):
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
