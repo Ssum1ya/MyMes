@@ -1,5 +1,5 @@
-from tkinter import Tk, Label, Button, Entry, Listbox, Frame, Scrollbar, Text, PhotoImage
-from tkinter import RIGHT, LEFT, BOTH, Y, END
+from tkinter import Tk, Label, Button, Entry, Frame, Scrollbar, Text, PhotoImage, Canvas
+from tkinter import END, VERTICAL, N, W, E, S
 from tkinter import messagebox
 import requests
 from threading import Thread
@@ -7,6 +7,7 @@ from time import sleep
 
 from workTools.ServerResponceHandler import ServerResponceHandler
 from workTools.ChatsWindow import ChatsWindow
+from workTools.ChatLoadingMessage import ChatLoadingMessage
 
 root = Tk()
 log_img = PhotoImage(file = 'app/images/login.png')
@@ -15,12 +16,19 @@ reg_img = PhotoImage(file = 'app/images/reg.png')
 login_password_id__array = []
 thread_flag = True
 
+y1 = 50
+y2 = 80
+
 def clear():
     for widget in root.winfo_children():
     	widget.destroy()
 
 def main_menu():
+    global y1
+    global y2
     global thread_flag
+    y1 = 50
+    y2 = 80
     thread_flag = False
     clear()
 
@@ -43,8 +51,6 @@ def show_my_chats():
     clear()
     root.title('My chats')
     root.geometry('400x600')
-    root.configure(bg = "#fff")
-    root.resizable(False, False)
 
     frame = Frame(root, width = 350, height = 600, bg = "white")
     frame.place(x = 0, y = 0)
@@ -54,9 +60,7 @@ def show_my_chats():
 
     request = requests.post('http://127.0.0.1:5000/users', json = {'login': login_password_id__array[0]})
     chats = request.content.decode()
-
     chats_mas, ids_mas = ServerResponceHandler.chats_handler(chats)
-
     chats_mas_split = [chats_mas[i:i+9] for i in range(0, len(chats_mas), 9)]
     ids_mas_split = [ids_mas[i:i+9] for i in range(0, len(ids_mas), 9)]
     
@@ -76,8 +80,6 @@ def add_person2chats():
     clear()
     root.title('Add person to my chats')
     root.geometry('400x250')
-    root.configure(bg = "#fff")
-    root.resizable(False, False)
 
     frame = Frame(root, width = 400, height = 400, bg = "white")
     frame.place(x = 0, y = 0)
@@ -96,6 +98,7 @@ def add_person2chats():
     Button(frame, width = 39, pady = 7, text = 'Добавить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda : check_login_in_bd(person_login.get(), )).place(x = 55, y = 157)
     Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 207)
 
+# TODO: вынести в отдельный файл
 def check_login_in_bd(user_login):
     request = requests.post('http://127.0.0.1:5000/add_person2chats', json = {'chat': user_login,
                                                                               'login': login_password_id__array[0]})
@@ -122,65 +125,105 @@ def chat(user_chat):
     root.title(user_chat)
     root.geometry('400x600')
 
-    frame = Frame(root, width = 400, height = 400, bg = "white")
-    frame.place(x = 0, y = 400)
+    canvas = Canvas(bg="white", height = 400) 
+    canvas.grid(column=0, row=0, sticky=(N,W,E,S))
+    root.grid_columnconfigure(0, weight=1)
+    root.grid_rowconfigure(0, weight=1)
+    canvas.place(x = 0, y = 0)
 
-    login1_mas, message_mas = show_history_messages(user_chat)
-        
-    messages_frame = Frame(root)
-    scrollbar = Scrollbar(messages_frame)
-
-    msg_list = Listbox(messages_frame, height = 25, width = 70, yscrollcommand = scrollbar.set)
-    scrollbar.pack(side = RIGHT, fill = Y)
-    msg_list.pack(side = LEFT, fill = BOTH)
-    msg_list.pack()
-    messages_frame.pack()
+    frame = Frame(root, width = 380, height = 400, bg = "white")
+    frame.place(x = 0, y = 400)   
 
     entry_field = Text(height=5, wrap="char")
-    entry_field.pack()
 
     Frame(frame, width = 400, height = 2, bg = 'black').place(x = 0, y = 90)
-    Button(frame, width = 39, pady = 7, text = 'Отправить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: send_message(entry_field.get("1.0", END), msg_list, user_chat, entry_field)).place(x = 55, y = 100)
+    Button(frame, width = 39, pady = 7, text = 'Отправить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: send_message(entry_field.get("1.0", END), canvas, user_chat, entry_field)).place(x = 55, y = 100)
     Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 150)
 
     root.protocol("WM_DELETE_WINDOW")
+    login1_mas, message_mas = show_history_messages(user_chat)
 
+    canvas.create_text(0, 0, anchor = "nw", text='Цвет ваших сообщений', fill="#57a1f8", font=("Courier", 12)) 
+    canvas.create_text(0, 15, anchor = "nw", text='Цвет - ' + user_chat, fill="#00FF00", font=("Courier", 12))
+    canvas.create_text(100, 30, anchor = "nw", text='Начало переписки', fill="#000000", font=("Courier", 12))
+
+    global y1 
+    global y2
     for i in range(len(message_mas)):
         login1 = login1_mas[i]
         message = message_mas[i]
-        msg_list.insert(END, f'{login1} : {message}')
+        y1, y2 = ChatLoadingMessage.load_message(canvas, login1, message, y1, y2, login_password_id__array[0])
 
-    msg_list.yview_scroll(number = len(message_mas), what = 'units')
+        y1 = y2 + 10
+        y2 = y1 + 30
+
+    v = Scrollbar(orient=VERTICAL)
+    canvas['scrollregion'] = (0, 0, y2, y2)
+    canvas['yscrollcommand'] = v.set
+    v["command"] = canvas.yview
+    v.grid(column=1, row=0, sticky=(N,S))
+    entry_field.grid(padx = 0, pady = 120)
+
+    canvas.yview_moveto(1)
     
-    loading_history_thread = Thread(target = lambda: load_new_message(msg_list, user_chat))
+    loading_history_thread = Thread(target = lambda: load_new_message(canvas, user_chat))
     loading_history_thread.start()
 
-def load_new_message(msg_list, user_chat):
+def load_new_message(canvas, user_chat):
+    global y1 
+    global y2
     flag = True              
     while flag and thread_flag:
-        sleep(5)
+        sleep(2)
         request = requests.post('http://127.0.0.1:5000/get_new_messages', json = {'login1' : user_chat, 
                                                                           'login2': login_password_id__array[0]})
         messages = request.content.decode()
         login1_mas, message_mas = ServerResponceHandler.message_handler(messages)
-        
+
         for i in range(len(message_mas)):
             login1 = login1_mas[i]
             message = message_mas[i]
             try:
-                msg_list.insert(END, f'{login1} : {message}')
-                msg_list.yview_scroll(number = 1, what = 'units')
+                y1, y2 = ChatLoadingMessage.load_message(canvas, login1, message, y1, y2, login_password_id__array[0])
+
+                y1 = y2 + 10
+                y2 = y1 + 30
+
+                canvas['scrollregion'] = (0, 0, y2, y2)
+                canvas.yview_moveto(1)
             except:
                 flag = False
 
-def send_message(message, msg_list, user_chat, entry_field):
+def send_message(message, canvas, user_chat, entry_field):
+    global y1
+    global y2
     request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat,
                                                                                      'text': message})
-    msg_list.insert(END, f'{login_password_id__array[0]} : {message}')
-    msg_list.yview_scroll(number = 1, what = 'units')
+    lines = [message[i:i+36] for i in range(0, len(message), 36)]
+    x_canvas = 375
+
+    if len(lines) > 1:
+        y2 += 12 * len(lines) - 1
+    if len(lines) == 1 and len(lines[0]) < 36:
+        x_canvas -= 10 * (36 - len(lines[0]))
+
+    canvas.create_rectangle(5, y1, x_canvas, y2, fill="#57a1f8", outline="#000000")
+
+    y1_string = y1 + 5
+    for i in lines:
+        canvas.create_text(10, y1_string, anchor = "nw", text=i, fill="#004D40", font=("Courier", 12))
+        y1_string += 15
+
+    y1 = y2 + 10
+    y2 = y1 + 30
+
+    canvas['scrollregion'] = (0, 0, y2, y2)
+    canvas.yview_moveto(1)
+
     entry_field.delete("1.0", END)
 
+# TODO: вынести в отдельный файл
 def show_history_messages(user_chat):
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat})
@@ -227,6 +270,7 @@ def login():
     sign_up = Button(frame, width = 19, text = 'Зарегистрироваться', border = 0, bg = 'white', cursor = 'hand2', fg = '#57a1f8', command = registration)
     sign_up.place(x = 165, y = 270)
 
+# TODO: вынести в отдельный файл
 def reg(user_login, password1, password2):
     if password1 != password2:
         messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как пароли не совпадают')
@@ -248,8 +292,6 @@ def registration():
     clear()
     root.title('Registration')
     root.geometry('925x500+300+200')
-    root.configure(bg = "#fff")
-    root.resizable(False, False)
 
     Label(root, image = reg_img, bg = 'white').place(x = 50, y = 50)
 
@@ -283,7 +325,6 @@ def registration():
 
     Frame(frame, width = 295, height = 2, bg = 'black').place(x = 25, y = 247)
     
-
     Button(frame, width = 39, pady = 7, text = 'Зарегестрироваться', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: reg(user.get(), code.get(), conform_code.get())).place(x = 35, y = 280)
     label = Label(frame, text = "Уже есть учетная запись?", fg = 'black', bg = 'white', font = ('Microsoft YaHei UI Light', 9))
     label.place(x = 40, y = 320)
@@ -291,6 +332,7 @@ def registration():
     sign_up = Button(frame, width = 5, text = 'Войти', border = 0, bg = 'white', cursor = 'hand2', fg = '#57a1f8', command = login)
     sign_up.place(x = 200, y = 320)
 
+# TODO: вынести в отдельный файл
 def log(user_login, user_password):
     request = requests.post('http://127.0.0.1:5000/login', json = {'login': user_login,
                                                          'password': user_password})
