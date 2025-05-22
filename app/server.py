@@ -207,6 +207,12 @@ def get_history():
 def send_message():
     if request.method == 'POST':
         responce = request.get_json()
+
+        if (len(responce['text'])) == 1:
+            return 'Denied empty message'
+        if len(responce['text']) > 253:
+            return 'Denied long message'
+        
         db = get_db_connection()
         cursor = db.cursor()
 
