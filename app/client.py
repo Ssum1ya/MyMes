@@ -104,19 +104,21 @@ def add_person2chats():
 def check_login_in_bd(user_login):
     request = requests.post('http://127.0.0.1:5000/add_person2chats', json = {'chat': user_login,
                                                                               'login': login_password_id__array[0]})
-    if request.content == b'Success':
+    server_answer = json.loads(request.content.decode())
+    answer = server_answer['answer']
+    if answer == 'Success':
         messagebox.showinfo('Успех', 'пользователь успешно добавлен в ваши чаты')
         main_menu()
-    elif request.content == b'Denied':
+    elif answer == 'Denied':
         messagebox.showinfo('Ошибка', 'не удалось найти пользователя с логином')
         add_person2chats()
-    elif request.content == b'Denied login equals chat':
+    elif answer == 'Denied login equals chat':
         messagebox.showinfo('Ошибка', 'ваш логин равен чату который хотите добавить')
         add_person2chats()
-    elif request.content == b'Denied empty string':
+    elif answer == 'Denied empty string':
         messagebox.showinfo('Ошибка', 'введите не пустую строку')
         add_person2chats()
-    elif request.content == b'Denied already in chats':
+    elif answer == 'Denied already in chats':
         messagebox.showinfo('Ошибка', 'этот пользователь уже у вас в чатах')
         add_person2chats()
 

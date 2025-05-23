@@ -82,7 +82,7 @@ def registration():
             db.close()
         return {'answer' : 'Success'}
 
-@app.route('/add_person2chats', methods = ['GET', 'POST'])
+@app.route('/add_person2chats', methods = ['POST'])
 def add_perwon2chats():
     if request.method == 'POST':
         responce = request.get_json()
@@ -91,7 +91,7 @@ def add_perwon2chats():
 
         try:
             if responce['chat'] == '':
-                return 'Denied empty string'
+                return {'answer' : 'Denied empty string'}
             
             cursor.execute(select_chats, (responce['login'],))
             chats = cursor.fetchall()
@@ -99,12 +99,12 @@ def add_perwon2chats():
             for i in range(len(chats)):
                 chats_array.append(chats[i][0])
             if responce['chat'] in chats_array:
-                return 'Denied already in chats'
+                return {'answer' : 'Denied already in chats'}
 
             cursor.execute(check_login_for_registration, (responce['chat'],)) 
             login_coincidences = cursor.fetchall()
             if responce['login'] == responce['chat']:
-                return 'Denied login equals chat'
+                return {'answer' : 'Denied login equals chat'}
             elif len(login_coincidences) != 0:
                 insert_data = (responce['login'],  responce['chat'])
                 cursor.execute(insert_chat, insert_data)
@@ -114,13 +114,11 @@ def add_perwon2chats():
 
                 db.commit()
             else:
-                return 'Denied'
+                return {'answer' : 'Denied'}
         finally:
             cursor.close()
             db.close()
-        return 'Success'
-    else:
-        return 'no request'
+        return {'answer' : 'Success'}
 
 @app.route('/users', methods = ['GET', 'POST'])
 def get_users():
