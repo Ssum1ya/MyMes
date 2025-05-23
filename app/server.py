@@ -142,7 +142,7 @@ def get_users():
         db.close()
         return {'data' : chats_array}
 
-@app.route('/get_new_messages', methods = ['GET', 'POST'])
+@app.route('/get_new_messages', methods = ['POST'])
 def get_new_messages():
     if request.method == 'POST':
         responce = request.get_json()
@@ -166,9 +166,7 @@ def get_new_messages():
         
         cursor.close()
         db.close()
-        return new_messages_array
-    else:
-        return 'no request'
+        return {'data' : new_messages_array}
 
 @app.route('/get_history', methods = ['POST'])
 def get_history():

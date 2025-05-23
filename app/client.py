@@ -188,8 +188,15 @@ def load_new_message(canvas, user_chat):
         sleep(2)
         request = requests.post('http://127.0.0.1:5000/get_new_messages', json = {'login1' : user_chat, 
                                                                           'login2': login_password_id__array[0]})
-        messages = request.content.decode()
-        login1_mas, message_mas = ServerResponceHandler.message_handler(messages)
+        server_answer = json.loads(request.content.decode())
+        data = server_answer['data']
+        
+        #TODO: вынести в функцию
+        login1_mas = []
+        message_mas = []
+        for i in range(len(data)):
+            login1_mas.append(data[i][0].strip())
+            message_mas.append(data[i][1].strip())
 
         for i in range(len(message_mas)):
             login1 = login1_mas[i]
@@ -260,6 +267,7 @@ def show_history_messages(user_chat):
     server_answer = json.loads(request.content.decode())
     data = server_answer['data']
 
+    #TODO: вынести в функцию
     login1_mas = []
     message_mas = []
     for i in range(len(data)):
