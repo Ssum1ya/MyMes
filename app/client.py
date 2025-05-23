@@ -60,9 +60,16 @@ def show_my_chats():
     heading = Label(frame, text = 'Ваши чаты', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 23, 'bold'))
     heading.place(x = 120, y = 10)
 
-    request = requests.post('http://127.0.0.1:5000/users', json = {'login': login_password_id__array[0]})
-    chats = request.content.decode()
-    chats_mas, ids_mas = ServerResponceHandler.chats_handler(chats)
+    request = requests.get('http://127.0.0.1:5000/users', json = {'login': login_password_id__array[0]})
+    server_answer = json.loads(request.content.decode())
+    data = server_answer['data']
+
+    chats_mas = []
+    ids_mas = []
+    for i in range(len(data)):
+        chats_mas.append(data[i][0])
+        ids_mas.append(data[i][1])
+
     chats_mas_split = [chats_mas[i:i+9] for i in range(0, len(chats_mas), 9)]
     ids_mas_split = [ids_mas[i:i+9] for i in range(0, len(ids_mas), 9)]
     

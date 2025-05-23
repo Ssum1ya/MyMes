@@ -122,7 +122,7 @@ def add_perwon2chats():
 
 @app.route('/users', methods = ['GET', 'POST'])
 def get_users():
-    if request.method == 'POST':
+    if request.method == 'GET':
         responce = request.get_json()
         db = get_db_connection()
         cursor = db.cursor()
@@ -140,9 +140,7 @@ def get_users():
 
         cursor.close()
         db.close()
-        return chats_array
-    else:
-        return 'no request'
+        return {'data' : chats_array}
 
 @app.route('/get_new_messages', methods = ['GET', 'POST'])
 def get_new_messages():
