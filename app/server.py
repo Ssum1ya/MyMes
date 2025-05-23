@@ -37,9 +37,9 @@ def get_db_connection():
         database = cfg.DATABASE
     )
 
-@app.route('/login', methods = ['GET', 'POST'])
+@app.route('/login', methods = ['GET'])
 def login():
-    if request.method == 'POST':
+    if request.method == 'GET':
         responce = request.get_json()
         db = get_db_connection()
         cursor = db.cursor()
@@ -51,11 +51,9 @@ def login():
         db.close()
 
         if len(user_coincidences) == 0:
-            return 'Denied'
+            return {'error': 'Denied'}
         else:  
-            return 'Success'
-    else:
-        return 'no request'
+            return {'error': 'Success'}
 
 @app.route('/registration', methods = ['GET', 'POST'])
 def registration():

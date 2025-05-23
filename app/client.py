@@ -2,6 +2,7 @@ from tkinter import Tk, Label, Button, Entry, Frame, Scrollbar, Text, PhotoImage
 from tkinter import END, VERTICAL, N, W, E, S
 from tkinter import messagebox
 import requests
+import json
 from threading import Thread
 from time import sleep
 
@@ -354,17 +355,19 @@ def registration():
 
 # TODO: вынести в отдельный файл
 def log(user_login, user_password):
-    request = requests.post('http://127.0.0.1:5000/login', json = {'login': user_login,
+    request = requests.get('http://127.0.0.1:5000/login', json = {'login': user_login,
                                                          'password': user_password})
-    if request.content == b'Success':
+    server_answer = json.loads(request.content.decode())
+    error = server_answer['error']
+    if error == 'Success':
         if len(login_password_id__array) >= 2:
             for i in range(len(login_password_id__array)):
                 login_password_id__array.pop(0)
         login_password_id__array.append(user_login)
         login_password_id__array.append(user_password)
         main_menu()
-    elif request.content == b'Denied':
-        messagebox.showinfo('Ошибка', 'войти так как не удалось найти совпадения')
+    elif error == 'Denied':
+        messagebox.showinfo('Ошибка', 'Не удалось найти совпадения')
         login()
 
 login()
