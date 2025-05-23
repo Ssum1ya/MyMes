@@ -299,13 +299,15 @@ def reg(user_login, password1, password2):
     else:
         request = requests.post('http://127.0.0.1:5000/registration', json = {'login': user_login,
                                                                         'password': password1})
-        if request.content == b'Success':
+        server_answer = json.loads(request.content.decode())
+        answer = server_answer['answer']
+        if answer == 'Success':
             messagebox.showinfo('Успешно', 'Теперь войдите под своей учетной записью')
             login()
-        elif request.content == b'Denied':
+        elif answer == 'Denied':
             messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как такой логин уже есть')
             registration()
-        elif request.content == b'Denied long login':
+        elif answer == 'Denied long login':
             messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как логин слишком длинный')
             registration()
     
@@ -358,15 +360,15 @@ def log(user_login, user_password):
     request = requests.get('http://127.0.0.1:5000/login', json = {'login': user_login,
                                                          'password': user_password})
     server_answer = json.loads(request.content.decode())
-    error = server_answer['error']
-    if error == 'Success':
+    answer = server_answer['answer']
+    if answer == 'Success':
         if len(login_password_id__array) >= 2:
             for i in range(len(login_password_id__array)):
                 login_password_id__array.pop(0)
         login_password_id__array.append(user_login)
         login_password_id__array.append(user_password)
         main_menu()
-    elif error == 'Denied':
+    elif answer == 'Denied':
         messagebox.showinfo('Ошибка', 'Не удалось найти совпадения')
         login()
 

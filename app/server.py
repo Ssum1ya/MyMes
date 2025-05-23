@@ -51,11 +51,11 @@ def login():
         db.close()
 
         if len(user_coincidences) == 0:
-            return {'error': 'Denied'}
+            return {'answer' : 'Denied'}
         else:  
-            return {'error': 'Success'}
+            return {'answer' : 'Success'}
 
-@app.route('/registration', methods = ['GET', 'POST'])
+@app.route('/registration', methods = ['POST'])
 def registration():
     if request.method == 'POST':
         responce = request.get_json()
@@ -69,20 +69,18 @@ def registration():
             cursor.execute(check_login_for_registration, (responce['login'],)) 
             login_coincidences = cursor.fetchall()
             if len(login_coincidences) != 0:
-                return 'Denied' 
+                return {'answer' : 'Denied'} 
             else:
                 user = (last_id[0] + 1, responce['login'],  responce['password'])
                 try:
                     cursor.execute(insert_reg, user)
                 except:
-                    return 'Denied long login'
+                    return {'answer' : 'Denied long login'}
                 db.commit()
         finally:
             cursor.close()
             db.close()
-        return 'Success'
-    else:
-        return 'no request'
+        return {'answer' : 'Success'}
 
 @app.route('/add_person2chats', methods = ['GET', 'POST'])
 def add_perwon2chats():
