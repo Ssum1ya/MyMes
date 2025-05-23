@@ -6,7 +6,6 @@ import json
 from threading import Thread
 from time import sleep
 
-from workTools.ServerResponceHandler import ServerResponceHandler
 from workTools.ChatsWindow import ChatsWindow
 from workTools.ChatLoadingMessage import ChatLoadingMessage
 from workTools.MessageHandler import MessageHandler
@@ -190,7 +189,7 @@ def load_new_message(canvas, user_chat):
                                                                           'login2': login_password_id__array[0]})
         server_answer = json.loads(request.content.decode())
         data = server_answer['data']
-        
+
         #TODO: вынести в функцию
         login1_mas = []
         message_mas = []
@@ -226,7 +225,9 @@ def send_message(message, canvas, user_chat, entry_field):
         request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
                                                                                         'login2': user_chat,
                                                                                         'text': message})
-        check = check_message(request.content)
+        server_answer = json.loads(request.content.decode())
+        answer = server_answer['answer']
+        check = check_message(answer)
         if check == 'Success':
             lines = [message[i:i+36] for i in range(0, len(message), 36)]
             x_canvas = 375
@@ -253,9 +254,9 @@ def send_message(message, canvas, user_chat, entry_field):
 
 # TODO: вынести в отдельный файл
 def check_message(server_answer):
-    if server_answer == b'Denied empty message':
+    if server_answer == 'Denied empty message':
         messagebox.showinfo('Отклонено', 'Ваще сообщение путстое')
-    elif server_answer == b'Denied long message':
+    elif server_answer == 'Denied long message':
         messagebox.showinfo('Отклонено', 'Слишком большое сообщение')
     else:
         return 'Success'

@@ -191,15 +191,13 @@ def get_history():
         db.close()
         return {'data' : messages_array}
 
-@app.route('/send_message', methods = ['GET', 'POST'])
+@app.route('/send_message', methods = ['POST'])
 def send_message():
     if request.method == 'POST':
         responce = request.get_json()
 
-        if (len(responce['text'])) == 1:
-            return 'Denied empty message'
         if len(responce['text']) > 253:
-            return 'Denied long message'
+            return {'answer' : 'Denied long message'}
         
         db = get_db_connection()
         cursor = db.cursor()
@@ -216,9 +214,7 @@ def send_message():
         db.commit()
         cursor.close()
         db.close()
-        return 'Success'
-    else:
-        return 'no request'
+        return {'answer' : 'Success'}
 
 if __name__ == '__main__':
     app.run(debug = True)

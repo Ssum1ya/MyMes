@@ -18,6 +18,5 @@ class MessageHandler:
     @staticmethod
     def handle_message(message):
         string = message
-        string = message.replace(',', ' ')
         string = sub(r'\s+', ' ', string)
         return string
