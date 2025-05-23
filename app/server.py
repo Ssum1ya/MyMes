@@ -120,7 +120,7 @@ def add_perwon2chats():
             db.close()
         return {'answer' : 'Success'}
 
-@app.route('/users', methods = ['GET', 'POST'])
+@app.route('/users', methods = ['GET'])
 def get_users():
     if request.method == 'GET':
         responce = request.get_json()
@@ -170,7 +170,7 @@ def get_new_messages():
     else:
         return 'no request'
 
-@app.route('/get_history', methods = ['GET', 'POST'])
+@app.route('/get_history', methods = ['POST'])
 def get_history():
     if request.method == 'POST':
         responce = request.get_json()
@@ -191,9 +191,7 @@ def get_history():
 
         cursor.close()
         db.close()
-        return messages_array
-    else:
-        return 'no request'
+        return {'data' : messages_array}
 
 @app.route('/send_message', methods = ['GET', 'POST'])
 def send_message():

@@ -257,9 +257,15 @@ def check_message(server_answer):
 def show_history_messages(user_chat):
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat})
-    messages = request.content.decode()
-    login1_mas, message_mas = ServerResponceHandler.message_handler(messages)
-    
+    server_answer = json.loads(request.content.decode())
+    data = server_answer['data']
+
+    login1_mas = []
+    message_mas = []
+    for i in range(len(data)):
+        login1_mas.append(data[i][0].strip())
+        message_mas.append(data[i][1].strip()) 
+
     return login1_mas, message_mas
 
 def login():
