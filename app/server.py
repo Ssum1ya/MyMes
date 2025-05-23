@@ -63,14 +63,13 @@ def registration():
         cursor = db.cursor()
 
         try:
-            cursor.execute(select_last_id)
-            last_id = cursor.fetchone()
-
             cursor.execute(check_login_for_registration, (responce['login'],)) 
             login_coincidences = cursor.fetchall()
             if len(login_coincidences) != 0:
                 return {'answer' : 'Denied'} 
             else:
+                cursor.execute(select_last_id)
+                last_id = cursor.fetchone()
                 user = (last_id[0] + 1, responce['login'],  responce['password'])
                 try:
                     cursor.execute(insert_reg, user)
@@ -83,16 +82,18 @@ def registration():
         return {'answer' : 'Success'}
 
 @app.route('/add_person2chats', methods = ['POST'])
-def add_perwon2chats():
+def add_person2chats():
     if request.method == 'POST':
         responce = request.get_json()
+        if responce['chat'] == '':
+            return {'answer' : 'Denied empty string'}
+        if responce['login'] == responce['chat']:
+            return {'answer' : 'Denied login equals chat'}
+        
         db = get_db_connection()
         cursor = db.cursor()
 
         try:
-            if responce['chat'] == '':
-                return {'answer' : 'Denied empty string'}
-            
             cursor.execute(select_chats, (responce['login'],))
             chats = cursor.fetchall()
             chats_array = []
@@ -103,9 +104,7 @@ def add_perwon2chats():
 
             cursor.execute(check_login_for_registration, (responce['chat'],)) 
             login_coincidences = cursor.fetchall()
-            if responce['login'] == responce['chat']:
-                return {'answer' : 'Denied login equals chat'}
-            elif len(login_coincidences) != 0:
+            if len(login_coincidences) != 0:
                 insert_data = (responce['login'],  responce['chat'])
                 cursor.execute(insert_chat, insert_data)
 
