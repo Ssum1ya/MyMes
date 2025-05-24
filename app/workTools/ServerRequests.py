@@ -43,6 +43,27 @@ class ServerRequests:
             elif answer == 'Denied long login':
                 messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как логин слишком длинный')
                 self.registration()
+    
+    def check_login_in_bd(self, user_login, login_password_id__array):
+        request = requests.post('http://127.0.0.1:5000/add_person2chats', json = {'chat': user_login,
+                                                                                'login': login_password_id__array[0]})
+        server_answer = json.loads(request.content.decode())
+        answer = server_answer['answer']
+        if answer == 'Success':
+            messagebox.showinfo('Успех', 'пользователь успешно добавлен в ваши чаты')
+            self.main_menu()
+        elif answer == 'Denied':
+            messagebox.showinfo('Ошибка', 'не удалось найти пользователя с логином')
+            self.add_person2chats()
+        elif answer == 'Denied login equals chat':
+            messagebox.showinfo('Ошибка', 'ваш логин равен чату который хотите добавить')
+            self.add_person2chats()
+        elif answer == 'Denied empty string':
+            messagebox.showinfo('Ошибка', 'введите не пустую строку')
+            self.add_person2chats()
+        elif answer == 'Denied already in chats':
+            messagebox.showinfo('Ошибка', 'этот пользователь уже у вас в чатах')
+            self.add_person2chats()
 
     def show_history_messages(self, user_chat, login_password_id__array):
         request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],

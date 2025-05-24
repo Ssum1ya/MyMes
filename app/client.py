@@ -104,30 +104,8 @@ def add_person2chats():
 
     Frame(frame, width = 295, height = 2, bg = 'black').place(x = 45, y = 127)
 
-    Button(frame, width = 39, pady = 7, text = 'Добавить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda : check_login_in_bd(person_login.get(), )).place(x = 55, y = 157)
+    Button(frame, width = 39, pady = 7, text = 'Добавить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda : serverRequests.check_login_in_bd(person_login.get(), login_password_id__array)).place(x = 55, y = 157)
     Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 207)
-
-# TODO: вынести в отдельный файл
-def check_login_in_bd(user_login):
-    request = requests.post('http://127.0.0.1:5000/add_person2chats', json = {'chat': user_login,
-                                                                              'login': login_password_id__array[0]})
-    server_answer = json.loads(request.content.decode())
-    answer = server_answer['answer']
-    if answer == 'Success':
-        messagebox.showinfo('Успех', 'пользователь успешно добавлен в ваши чаты')
-        main_menu()
-    elif answer == 'Denied':
-        messagebox.showinfo('Ошибка', 'не удалось найти пользователя с логином')
-        add_person2chats()
-    elif answer == 'Denied login equals chat':
-        messagebox.showinfo('Ошибка', 'ваш логин равен чату который хотите добавить')
-        add_person2chats()
-    elif answer == 'Denied empty string':
-        messagebox.showinfo('Ошибка', 'введите не пустую строку')
-        add_person2chats()
-    elif answer == 'Denied already in chats':
-        messagebox.showinfo('Ошибка', 'этот пользователь уже у вас в чатах')
-        add_person2chats()
 
 def chat(user_chat):
     global thread_flag
