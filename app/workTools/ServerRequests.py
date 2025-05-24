@@ -79,3 +79,11 @@ class ServerRequests:
             message_mas.append(data[i][1].strip()) 
 
         return login1_mas, message_mas
+    
+    def check_message(self, server_answer):
+        if server_answer == 'Denied empty message':
+            messagebox.showinfo('Отклонено', 'Ваще сообщение путстое')
+        elif server_answer == 'Denied long message':
+            messagebox.showinfo('Отклонено', 'Слишком большое сообщение')
+        else:
+            return 'Success'

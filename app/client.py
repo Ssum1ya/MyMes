@@ -206,7 +206,7 @@ def send_message(message, canvas, user_chat, entry_field):
                                                                                         'text': message})
         server_answer = json.loads(request.content.decode())
         answer = server_answer['answer']
-        check = check_message(answer)
+        check = serverRequests.check_message(answer)
         if check == 'Success':
             lines = [message[i:i+36] for i in range(0, len(message), 36)]
             x_canvas = 375
@@ -229,16 +229,7 @@ def send_message(message, canvas, user_chat, entry_field):
             canvas['scrollregion'] = (0, 0, y2, y2)
             canvas.yview_moveto(1)
 
-            entry_field.delete("1.0", END)
-
-# TODO: вынести в отдельный файл
-def check_message(server_answer):
-    if server_answer == 'Denied empty message':
-        messagebox.showinfo('Отклонено', 'Ваще сообщение путстое')
-    elif server_answer == 'Denied long message':
-        messagebox.showinfo('Отклонено', 'Слишком большое сообщение')
-    else:
-        return 'Success'    
+            entry_field.delete("1.0", END)   
 
 def login():
     clear()
