@@ -9,6 +9,7 @@ from time import sleep
 from workTools.ChatsWindow import ChatsWindow
 from workTools.ChatLoadingMessage import ChatLoadingMessage
 from workTools.MessageHandler import MessageHandler
+from workTools.ServerRequests import ServerRequests
 
 root = Tk()
 log_img = PhotoImage(file = 'app/images/login.png')
@@ -308,7 +309,7 @@ def login():
 
     Frame(frame, width = 295, height = 2, bg = 'black').place(x = 25, y = 177)
 
-    Button(frame, width = 39, pady = 7, text = 'Войти', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: log(user.get(), code.get())).place(x = 35, y = 204)
+    Button(frame, width = 39, pady = 7, text = 'Войти', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: serverRequests.log(user.get(), code.get(), login_password_id__array)).place(x = 35, y = 204)
     label = Label(frame, text = "Нет учетной записи?", fg = 'black', bg = 'white', font = ('Microsoft YaHei UI Light', 9))
     label.place(x = 35, y = 270)
 
@@ -379,23 +380,7 @@ def registration():
     sign_up = Button(frame, width = 5, text = 'Войти', border = 0, bg = 'white', cursor = 'hand2', fg = '#57a1f8', command = login)
     sign_up.place(x = 200, y = 320)
 
-# TODO: вынести в отдельный файл
-def log(user_login, user_password):
-    request = requests.get('http://127.0.0.1:5000/login', json = {'login': user_login,
-                                                         'password': user_password})
-    server_answer = json.loads(request.content.decode())
-    answer = server_answer['answer']
-    if answer == 'Success':
-        if len(login_password_id__array) >= 2:
-            for i in range(len(login_password_id__array)):
-                login_password_id__array.pop(0)
-        login_password_id__array.append(user_login)
-        login_password_id__array.append(user_password)
-        main_menu()
-    elif answer == 'Denied':
-        messagebox.showinfo('Ошибка', 'Не удалось найти совпадения')
-        login()
-
+serverRequests = ServerRequests(main_menu = main_menu, add_person2chats = add_person2chats, registration = registration, login = login)
 login()
 
 root.mainloop()
