@@ -9,6 +9,7 @@ from time import sleep
 from workTools.ChatsWindow import ChatsWindow
 from workTools.ChatLoadingMessage import ChatLoadingMessage
 from workTools.MessageHandler import MessageHandler
+from workTools.ServerRequests import ServerRequests
 
 root = Tk()
 log_img = PhotoImage(file = 'app/images/login.png')
@@ -103,30 +104,8 @@ def add_person2chats():
 
     Frame(frame, width = 295, height = 2, bg = 'black').place(x = 45, y = 127)
 
-    Button(frame, width = 39, pady = 7, text = 'Добавить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda : check_login_in_bd(person_login.get(), )).place(x = 55, y = 157)
+    Button(frame, width = 39, pady = 7, text = 'Добавить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda : serverRequests.check_login_in_bd(person_login.get(), login_password_id__array)).place(x = 55, y = 157)
     Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 207)
-
-# TODO: вынести в отдельный файл
-def check_login_in_bd(user_login):
-    request = requests.post('http://127.0.0.1:5000/add_person2chats', json = {'chat': user_login,
-                                                                              'login': login_password_id__array[0]})
-    server_answer = json.loads(request.content.decode())
-    answer = server_answer['answer']
-    if answer == 'Success':
-        messagebox.showinfo('Успех', 'пользователь успешно добавлен в ваши чаты')
-        main_menu()
-    elif answer == 'Denied':
-        messagebox.showinfo('Ошибка', 'не удалось найти пользователя с логином')
-        add_person2chats()
-    elif answer == 'Denied login equals chat':
-        messagebox.showinfo('Ошибка', 'ваш логин равен чату который хотите добавить')
-        add_person2chats()
-    elif answer == 'Denied empty string':
-        messagebox.showinfo('Ошибка', 'введите не пустую строку')
-        add_person2chats()
-    elif answer == 'Denied already in chats':
-        messagebox.showinfo('Ошибка', 'этот пользователь уже у вас в чатах')
-        add_person2chats()
 
 def chat(user_chat):
     global thread_flag
@@ -151,7 +130,7 @@ def chat(user_chat):
     Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 150)
 
     root.protocol("WM_DELETE_WINDOW")
-    login1_mas, message_mas = show_history_messages(user_chat)
+    login1_mas, message_mas = serverRequests.show_history_messages(user_chat, login_password_id__array)
 
     canvas.create_text(0, 0, anchor = "nw", text='Цвет ваших сообщений', fill="#57a1f8", font=("Courier", 12)) 
     canvas.create_text(0, 15, anchor = "nw", text='Цвет - ' + user_chat, fill="#00FF00", font=("Courier", 12))
@@ -190,7 +169,6 @@ def load_new_message(canvas, user_chat):
         server_answer = json.loads(request.content.decode())
         data = server_answer['data']
 
-        #TODO: вынести в функцию
         login1_mas = []
         message_mas = []
         for i in range(len(data)):
@@ -227,7 +205,7 @@ def send_message(message, canvas, user_chat, entry_field):
                                                                                         'text': message})
         server_answer = json.loads(request.content.decode())
         answer = server_answer['answer']
-        check = check_message(answer)
+        check = serverRequests.check_message(answer)
         if check == 'Success':
             lines = [message[i:i+36] for i in range(0, len(message), 36)]
             x_canvas = 375
@@ -250,32 +228,7 @@ def send_message(message, canvas, user_chat, entry_field):
             canvas['scrollregion'] = (0, 0, y2, y2)
             canvas.yview_moveto(1)
 
-            entry_field.delete("1.0", END)
-
-# TODO: вынести в отдельный файл
-def check_message(server_answer):
-    if server_answer == 'Denied empty message':
-        messagebox.showinfo('Отклонено', 'Ваще сообщение путстое')
-    elif server_answer == 'Denied long message':
-        messagebox.showinfo('Отклонено', 'Слишком большое сообщение')
-    else:
-        return 'Success'
-    
-# TODO: вынести в отдельный файл
-def show_history_messages(user_chat):
-    request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
-                                                                                     'login2': user_chat})
-    server_answer = json.loads(request.content.decode())
-    data = server_answer['data']
-
-    #TODO: вынести в функцию
-    login1_mas = []
-    message_mas = []
-    for i in range(len(data)):
-        login1_mas.append(data[i][0].strip())
-        message_mas.append(data[i][1].strip()) 
-
-    return login1_mas, message_mas
+            entry_field.delete("1.0", END)   
 
 def login():
     clear()
@@ -308,32 +261,12 @@ def login():
 
     Frame(frame, width = 295, height = 2, bg = 'black').place(x = 25, y = 177)
 
-    Button(frame, width = 39, pady = 7, text = 'Войти', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: log(user.get(), code.get())).place(x = 35, y = 204)
+    Button(frame, width = 39, pady = 7, text = 'Войти', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: serverRequests.log(user.get(), code.get(), login_password_id__array)).place(x = 35, y = 204)
     label = Label(frame, text = "Нет учетной записи?", fg = 'black', bg = 'white', font = ('Microsoft YaHei UI Light', 9))
     label.place(x = 35, y = 270)
 
     sign_up = Button(frame, width = 19, text = 'Зарегистрироваться', border = 0, bg = 'white', cursor = 'hand2', fg = '#57a1f8', command = registration)
     sign_up.place(x = 165, y = 270)
-
-# TODO: вынести в отдельный файл
-def reg(user_login, password1, password2):
-    if password1 != password2:
-        messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как пароли не совпадают')
-        registration()
-    else:
-        request = requests.post('http://127.0.0.1:5000/registration', json = {'login': user_login,
-                                                                        'password': password1})
-        server_answer = json.loads(request.content.decode())
-        answer = server_answer['answer']
-        if answer == 'Success':
-            messagebox.showinfo('Успешно', 'Теперь войдите под своей учетной записью')
-            login()
-        elif answer == 'Denied':
-            messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как такой логин уже есть')
-            registration()
-        elif answer == 'Denied long login':
-            messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как логин слишком длинный')
-            registration()
     
 def registration():
     clear()
@@ -372,30 +305,14 @@ def registration():
 
     Frame(frame, width = 295, height = 2, bg = 'black').place(x = 25, y = 247)
     
-    Button(frame, width = 39, pady = 7, text = 'Зарегестрироваться', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: reg(user.get(), code.get(), conform_code.get())).place(x = 35, y = 280)
+    Button(frame, width = 39, pady = 7, text = 'Зарегестрироваться', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: serverRequests.reg(user.get(), code.get(), conform_code.get())).place(x = 35, y = 280)
     label = Label(frame, text = "Уже есть учетная запись?", fg = 'black', bg = 'white', font = ('Microsoft YaHei UI Light', 9))
     label.place(x = 40, y = 320)
 
     sign_up = Button(frame, width = 5, text = 'Войти', border = 0, bg = 'white', cursor = 'hand2', fg = '#57a1f8', command = login)
     sign_up.place(x = 200, y = 320)
 
-# TODO: вынести в отдельный файл
-def log(user_login, user_password):
-    request = requests.get('http://127.0.0.1:5000/login', json = {'login': user_login,
-                                                         'password': user_password})
-    server_answer = json.loads(request.content.decode())
-    answer = server_answer['answer']
-    if answer == 'Success':
-        if len(login_password_id__array) >= 2:
-            for i in range(len(login_password_id__array)):
-                login_password_id__array.pop(0)
-        login_password_id__array.append(user_login)
-        login_password_id__array.append(user_password)
-        main_menu()
-    elif answer == 'Denied':
-        messagebox.showinfo('Ошибка', 'Не удалось найти совпадения')
-        login()
-
+serverRequests = ServerRequests(main_menu = main_menu, add_person2chats = add_person2chats, registration = registration, login = login)
 login()
 
 root.mainloop()
