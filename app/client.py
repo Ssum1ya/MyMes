@@ -2,10 +2,10 @@ from tkinter import Tk, Label, Button, Entry, Frame, Scrollbar, Text, PhotoImage
 from tkinter import END, VERTICAL, N, W, E, S
 from tkinter import messagebox
 import requests
+import json
 from threading import Thread
 from time import sleep
 
-from workTools.ServerResponceHandler import ServerResponceHandler
 from workTools.ChatsWindow import ChatsWindow
 from workTools.ChatLoadingMessage import ChatLoadingMessage
 from workTools.MessageHandler import MessageHandler
@@ -59,9 +59,16 @@ def show_my_chats():
     heading = Label(frame, text = 'Ваши чаты', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 23, 'bold'))
     heading.place(x = 120, y = 10)
 
-    request = requests.post('http://127.0.0.1:5000/users', json = {'login': login_password_id__array[0]})
-    chats = request.content.decode()
-    chats_mas, ids_mas = ServerResponceHandler.chats_handler(chats)
+    request = requests.get('http://127.0.0.1:5000/users', json = {'login': login_password_id__array[0]})
+    server_answer = json.loads(request.content.decode())
+    data = server_answer['data']
+
+    chats_mas = []
+    ids_mas = []
+    for i in range(len(data)):
+        chats_mas.append(data[i][0])
+        ids_mas.append(data[i][1])
+
     chats_mas_split = [chats_mas[i:i+9] for i in range(0, len(chats_mas), 9)]
     ids_mas_split = [ids_mas[i:i+9] for i in range(0, len(ids_mas), 9)]
     
@@ -103,19 +110,21 @@ def add_person2chats():
 def check_login_in_bd(user_login):
     request = requests.post('http://127.0.0.1:5000/add_person2chats', json = {'chat': user_login,
                                                                               'login': login_password_id__array[0]})
-    if request.content == b'Success':
+    server_answer = json.loads(request.content.decode())
+    answer = server_answer['answer']
+    if answer == 'Success':
         messagebox.showinfo('Успех', 'пользователь успешно добавлен в ваши чаты')
         main_menu()
-    elif request.content == b'Denied':
+    elif answer == 'Denied':
         messagebox.showinfo('Ошибка', 'не удалось найти пользователя с логином')
         add_person2chats()
-    elif request.content == b'Denied login equals chat':
+    elif answer == 'Denied login equals chat':
         messagebox.showinfo('Ошибка', 'ваш логин равен чату который хотите добавить')
         add_person2chats()
-    elif request.content == b'Denied empty string':
+    elif answer == 'Denied empty string':
         messagebox.showinfo('Ошибка', 'введите не пустую строку')
         add_person2chats()
-    elif request.content == b'Denied already in chats':
+    elif answer == 'Denied already in chats':
         messagebox.showinfo('Ошибка', 'этот пользователь уже у вас в чатах')
         add_person2chats()
 
@@ -178,8 +187,15 @@ def load_new_message(canvas, user_chat):
         sleep(2)
         request = requests.post('http://127.0.0.1:5000/get_new_messages', json = {'login1' : user_chat, 
                                                                           'login2': login_password_id__array[0]})
-        messages = request.content.decode()
-        login1_mas, message_mas = ServerResponceHandler.message_handler(messages)
+        server_answer = json.loads(request.content.decode())
+        data = server_answer['data']
+
+        #TODO: вынести в функцию
+        login1_mas = []
+        message_mas = []
+        for i in range(len(data)):
+            login1_mas.append(data[i][0].strip())
+            message_mas.append(data[i][1].strip())
 
         for i in range(len(message_mas)):
             login1 = login1_mas[i]
@@ -209,7 +225,9 @@ def send_message(message, canvas, user_chat, entry_field):
         request = requests.post('http://127.0.0.1:5000/send_message', json = {'login1': login_password_id__array[0],
                                                                                         'login2': user_chat,
                                                                                         'text': message})
-        check = check_message(request.content)
+        server_answer = json.loads(request.content.decode())
+        answer = server_answer['answer']
+        check = check_message(answer)
         if check == 'Success':
             lines = [message[i:i+36] for i in range(0, len(message), 36)]
             x_canvas = 375
@@ -236,9 +254,9 @@ def send_message(message, canvas, user_chat, entry_field):
 
 # TODO: вынести в отдельный файл
 def check_message(server_answer):
-    if server_answer == b'Denied empty message':
+    if server_answer == 'Denied empty message':
         messagebox.showinfo('Отклонено', 'Ваще сообщение путстое')
-    elif server_answer == b'Denied long message':
+    elif server_answer == 'Denied long message':
         messagebox.showinfo('Отклонено', 'Слишком большое сообщение')
     else:
         return 'Success'
@@ -247,9 +265,16 @@ def check_message(server_answer):
 def show_history_messages(user_chat):
     request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
                                                                                      'login2': user_chat})
-    messages = request.content.decode()
-    login1_mas, message_mas = ServerResponceHandler.message_handler(messages)
-    
+    server_answer = json.loads(request.content.decode())
+    data = server_answer['data']
+
+    #TODO: вынести в функцию
+    login1_mas = []
+    message_mas = []
+    for i in range(len(data)):
+        login1_mas.append(data[i][0].strip())
+        message_mas.append(data[i][1].strip()) 
+
     return login1_mas, message_mas
 
 def login():
@@ -298,13 +323,15 @@ def reg(user_login, password1, password2):
     else:
         request = requests.post('http://127.0.0.1:5000/registration', json = {'login': user_login,
                                                                         'password': password1})
-        if request.content == b'Success':
+        server_answer = json.loads(request.content.decode())
+        answer = server_answer['answer']
+        if answer == 'Success':
             messagebox.showinfo('Успешно', 'Теперь войдите под своей учетной записью')
             login()
-        elif request.content == b'Denied':
+        elif answer == 'Denied':
             messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как такой логин уже есть')
             registration()
-        elif request.content == b'Denied long login':
+        elif answer == 'Denied long login':
             messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как логин слишком длинный')
             registration()
     
@@ -354,17 +381,19 @@ def registration():
 
 # TODO: вынести в отдельный файл
 def log(user_login, user_password):
-    request = requests.post('http://127.0.0.1:5000/login', json = {'login': user_login,
+    request = requests.get('http://127.0.0.1:5000/login', json = {'login': user_login,
                                                          'password': user_password})
-    if request.content == b'Success':
+    server_answer = json.loads(request.content.decode())
+    answer = server_answer['answer']
+    if answer == 'Success':
         if len(login_password_id__array) >= 2:
             for i in range(len(login_password_id__array)):
                 login_password_id__array.pop(0)
         login_password_id__array.append(user_login)
         login_password_id__array.append(user_password)
         main_menu()
-    elif request.content == b'Denied':
-        messagebox.showinfo('Ошибка', 'войти так как не удалось найти совпадения')
+    elif answer == 'Denied':
+        messagebox.showinfo('Ошибка', 'Не удалось найти совпадения')
         login()
 
 login()

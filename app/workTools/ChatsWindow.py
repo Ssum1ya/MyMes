@@ -28,7 +28,7 @@ class ChatsWindow:
         y = 70
         if len(self.ids_mas) != 0:
             for i in range(len(self.chats_mas)):
-                if self.ids_mas[i] == '1':
+                if self.ids_mas[i] == 1:
                     user_button = Button(frame, width = 39, pady = 7, text = self.chats_mas[i], bg = '#00FF00', fg = 'black', border = 0)
                     user_button['command'] = lambda user_chat = self.chats_mas[i]: self.chat(user_chat)
                     user_button.place(x = 65, y = y)

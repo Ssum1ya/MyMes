@@ -37,9 +37,9 @@ def get_db_connection():
         database = cfg.DATABASE
     )
 
-@app.route('/login', methods = ['GET', 'POST'])
+@app.route('/login', methods = ['GET'])
 def login():
-    if request.method == 'POST':
+    if request.method == 'GET':
         responce = request.get_json()
         db = get_db_connection()
         cursor = db.cursor()
@@ -51,13 +51,11 @@ def login():
         db.close()
 
         if len(user_coincidences) == 0:
-            return 'Denied'
+            return {'answer' : 'Denied'}
         else:  
-            return 'Success'
-    else:
-        return 'no request'
+            return {'answer' : 'Success'}
 
-@app.route('/registration', methods = ['GET', 'POST'])
+@app.route('/registration', methods = ['POST'])
 def registration():
     if request.method == 'POST':
         responce = request.get_json()
@@ -65,51 +63,48 @@ def registration():
         cursor = db.cursor()
 
         try:
-            cursor.execute(select_last_id)
-            last_id = cursor.fetchone()
-
             cursor.execute(check_login_for_registration, (responce['login'],)) 
             login_coincidences = cursor.fetchall()
             if len(login_coincidences) != 0:
-                return 'Denied' 
+                return {'answer' : 'Denied'} 
             else:
+                cursor.execute(select_last_id)
+                last_id = cursor.fetchone()
                 user = (last_id[0] + 1, responce['login'],  responce['password'])
                 try:
                     cursor.execute(insert_reg, user)
                 except:
-                    return 'Denied long login'
+                    return {'answer' : 'Denied long login'}
                 db.commit()
         finally:
             cursor.close()
             db.close()
-        return 'Success'
-    else:
-        return 'no request'
+        return {'answer' : 'Success'}
 
-@app.route('/add_person2chats', methods = ['GET', 'POST'])
-def add_perwon2chats():
+@app.route('/add_person2chats', methods = ['POST'])
+def add_person2chats():
     if request.method == 'POST':
         responce = request.get_json()
+        if responce['chat'] == '':
+            return {'answer' : 'Denied empty string'}
+        if responce['login'] == responce['chat']:
+            return {'answer' : 'Denied login equals chat'}
+        
         db = get_db_connection()
         cursor = db.cursor()
 
         try:
-            if responce['chat'] == '':
-                return 'Denied empty string'
-            
             cursor.execute(select_chats, (responce['login'],))
             chats = cursor.fetchall()
             chats_array = []
             for i in range(len(chats)):
                 chats_array.append(chats[i][0])
             if responce['chat'] in chats_array:
-                return 'Denied already in chats'
+                return {'answer' : 'Denied already in chats'}
 
             cursor.execute(check_login_for_registration, (responce['chat'],)) 
             login_coincidences = cursor.fetchall()
-            if responce['login'] == responce['chat']:
-                return 'Denied login equals chat'
-            elif len(login_coincidences) != 0:
+            if len(login_coincidences) != 0:
                 insert_data = (responce['login'],  responce['chat'])
                 cursor.execute(insert_chat, insert_data)
 
@@ -118,17 +113,15 @@ def add_perwon2chats():
 
                 db.commit()
             else:
-                return 'Denied'
+                return {'answer' : 'Denied'}
         finally:
             cursor.close()
             db.close()
-        return 'Success'
-    else:
-        return 'no request'
+        return {'answer' : 'Success'}
 
-@app.route('/users', methods = ['GET', 'POST'])
+@app.route('/users', methods = ['GET'])
 def get_users():
-    if request.method == 'POST':
+    if request.method == 'GET':
         responce = request.get_json()
         db = get_db_connection()
         cursor = db.cursor()
@@ -146,11 +139,9 @@ def get_users():
 
         cursor.close()
         db.close()
-        return chats_array
-    else:
-        return 'no request'
+        return {'data' : chats_array}
 
-@app.route('/get_new_messages', methods = ['GET', 'POST'])
+@app.route('/get_new_messages', methods = ['POST'])
 def get_new_messages():
     if request.method == 'POST':
         responce = request.get_json()
@@ -174,11 +165,9 @@ def get_new_messages():
         
         cursor.close()
         db.close()
-        return new_messages_array
-    else:
-        return 'no request'
+        return {'data' : new_messages_array}
 
-@app.route('/get_history', methods = ['GET', 'POST'])
+@app.route('/get_history', methods = ['POST'])
 def get_history():
     if request.method == 'POST':
         responce = request.get_json()
@@ -199,19 +188,15 @@ def get_history():
 
         cursor.close()
         db.close()
-        return messages_array
-    else:
-        return 'no request'
+        return {'data' : messages_array}
 
-@app.route('/send_message', methods = ['GET', 'POST'])
+@app.route('/send_message', methods = ['POST'])
 def send_message():
     if request.method == 'POST':
         responce = request.get_json()
 
-        if (len(responce['text'])) == 1:
-            return 'Denied empty message'
         if len(responce['text']) > 253:
-            return 'Denied long message'
+            return {'answer' : 'Denied long message'}
         
         db = get_db_connection()
         cursor = db.cursor()
@@ -228,9 +213,7 @@ def send_message():
         db.commit()
         cursor.close()
         db.close()
-        return 'Success'
-    else:
-        return 'no request'
+        return {'answer' : 'Success'}
 
 if __name__ == '__main__':
     app.run(debug = True)
