@@ -169,7 +169,6 @@ def load_new_message(canvas, user_chat):
         server_answer = json.loads(request.content.decode())
         data = server_answer['data']
 
-        #TODO: вынести в функцию
         login1_mas = []
         message_mas = []
         for i in range(len(data)):

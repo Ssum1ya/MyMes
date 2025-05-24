@@ -71,7 +71,6 @@ class ServerRequests:
         server_answer = json.loads(request.content.decode())
         data = server_answer['data']
 
-        #TODO: вынести в функцию
         login1_mas = []
         message_mas = []
         for i in range(len(data)):
