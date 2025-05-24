@@ -152,7 +152,7 @@ def chat(user_chat):
     Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 150)
 
     root.protocol("WM_DELETE_WINDOW")
-    login1_mas, message_mas = show_history_messages(user_chat)
+    login1_mas, message_mas = serverRequests.show_history_messages(user_chat, login_password_id__array)
 
     canvas.create_text(0, 0, anchor = "nw", text='Цвет ваших сообщений', fill="#57a1f8", font=("Courier", 12)) 
     canvas.create_text(0, 15, anchor = "nw", text='Цвет - ' + user_chat, fill="#00FF00", font=("Courier", 12))
@@ -260,23 +260,7 @@ def check_message(server_answer):
     elif server_answer == 'Denied long message':
         messagebox.showinfo('Отклонено', 'Слишком большое сообщение')
     else:
-        return 'Success'
-    
-# TODO: вынести в отдельный файл
-def show_history_messages(user_chat):
-    request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
-                                                                                     'login2': user_chat})
-    server_answer = json.loads(request.content.decode())
-    data = server_answer['data']
-
-    #TODO: вынести в функцию
-    login1_mas = []
-    message_mas = []
-    for i in range(len(data)):
-        login1_mas.append(data[i][0].strip())
-        message_mas.append(data[i][1].strip()) 
-
-    return login1_mas, message_mas
+        return 'Success'    
 
 def login():
     clear()

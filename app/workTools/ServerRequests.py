@@ -43,3 +43,18 @@ class ServerRequests:
             elif answer == 'Denied long login':
                 messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как логин слишком длинный')
                 self.registration()
+
+    def show_history_messages(self, user_chat, login_password_id__array):
+        request = requests.post('http://127.0.0.1:5000/get_history', json = {'login1': login_password_id__array[0],
+                                                                                        'login2': user_chat})
+        server_answer = json.loads(request.content.decode())
+        data = server_answer['data']
+
+        #TODO: вынести в функцию
+        login1_mas = []
+        message_mas = []
+        for i in range(len(data)):
+            login1_mas.append(data[i][0].strip())
+            message_mas.append(data[i][1].strip()) 
+
+        return login1_mas, message_mas
