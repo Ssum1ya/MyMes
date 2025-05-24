@@ -24,3 +24,22 @@ class ServerRequests:
         elif answer == 'Denied':
             messagebox.showinfo('Ошибка', 'Не удалось найти совпадения')
             self.login()
+    
+    def reg(self, user_login, password1, password2):
+        if password1 != password2:
+            messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как пароли не совпадают')
+            self.registration()
+        else:
+            request = requests.post('http://127.0.0.1:5000/registration', json = {'login': user_login,
+                                                                            'password': password1})
+            server_answer = json.loads(request.content.decode())
+            answer = server_answer['answer']
+            if answer == 'Success':
+                messagebox.showinfo('Успешно', 'Теперь войдите под своей учетной записью')
+                self.login()
+            elif answer == 'Denied':
+                messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как такой логин уже есть')
+                self.registration()
+            elif answer == 'Denied long login':
+                messagebox.showinfo('Ошибка', 'Не удалось зарегистрироваться так как логин слишком длинный')
+                self.registration()
