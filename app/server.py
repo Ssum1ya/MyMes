@@ -224,7 +224,7 @@ def search():
         cursor = db.cursor()
 
         string_arg = '%' + responce['login_piece'] + '%'
-        cursor.execute(search, (string_arg,))
+        cursor.execute(search_select, (string_arg,))
         server_login_array = cursor.fetchall()
 
         login_array = []

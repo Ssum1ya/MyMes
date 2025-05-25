@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Button, Entry, Frame, Scrollbar, Text, PhotoImage, Canvas
+from tkinter import Tk, Label, Button, Entry, Frame, Scrollbar, Text, PhotoImage, Canvas, Toplevel, Listbox, Variable
 from tkinter import END, VERTICAL, N, W, E, S
 from tkinter import messagebox
 import requests
@@ -87,6 +87,23 @@ def show_my_chats():
 
 def add_person2chats():
     clear()
+    popup = Toplevel(root)
+    popup.title("Search system")
+    popup.geometry("400x250")
+    popup.protocol("WM_DELETE_WINDOW", lambda: None)
+
+    listbox = Listbox(popup)
+    listbox.pack(anchor='nw', fill='x', padx=5, pady=5)
+
+    def key_pressed(event): 
+       listbox.delete(0, 'end')
+       text = person_login.get()
+       request = requests.get('http://127.0.0.1:5000/searchLogin', json = {'login_piece': text})
+       server_answer = json.loads(request.content.decode())
+       answer = server_answer['data']
+       for login in answer:
+            listbox.insert(END, login)
+
     root.title('Add person to my chats')
     root.geometry('400x250')
 
@@ -101,6 +118,7 @@ def add_person2chats():
 
     person_login = Entry(frame, width = 40, fg = 'black', border = 0, bg = "white", font = ('Microsoft YaHei UI Light', 11), )
     person_login.place(x = 45, y = 100)
+    person_login.bind("<Key>", key_pressed)
 
     Frame(frame, width = 295, height = 2, bg = 'black').place(x = 45, y = 127)
 
