@@ -89,7 +89,7 @@ def add_person2chats():
     clear()
     popup = Toplevel(root)
     popup.title("Search system")
-    popup.geometry("400x250")
+    popup.geometry("400x170")
     popup.protocol("WM_DELETE_WINDOW", lambda: None)
 
     listbox = Listbox(popup)
