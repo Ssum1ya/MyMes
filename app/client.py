@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Button, Entry, Frame, Scrollbar, Text, PhotoImage, Canvas, Toplevel, Listbox, Variable
+from tkinter import Tk, Label, Button, Entry, Frame, Scrollbar, Text, PhotoImage, Canvas, Toplevel, Listbox
 from tkinter import END, VERTICAL, N, W, E, S
 from tkinter import messagebox
 import requests
