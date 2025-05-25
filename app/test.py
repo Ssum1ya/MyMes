@@ -13,11 +13,16 @@ def get_db_connection():
 
 search_select = 'SELECT login FROM users WHERE login LIKE %s'
 
-string = '%' + 'Ao' + '%'
+string = '%' + 's' + '%'
 
 db = get_db_connection()
 cursor = db.cursor()
 
 cursor.execute(search_select, (string,))
-user_coincidences = cursor.fetchall()
-print(user_coincidences)
+server_login_array = cursor.fetchall()
+login_array = []
+for i in range(len(server_login_array)):
+    login_array.append(server_login_array[i][0])
+
+
+print(login_array)
