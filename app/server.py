@@ -25,6 +25,7 @@ insert_new_message = 'INSERT INTO new_messages (id, login1, login2) VALUES (%s, 
 delete_new_message = 'DELETE FROM new_messages WHERE login1 = %s AND login2 = %s;' # SET SQL_SAFE_UPDATES = 0;
 select_new_message_id = 'SELECT id FROM new_messages where login1 = %s AND login2 = %s ORDER BY id ASC'
 select_new_message = 'SELECT login1, text FROM messages WHERE messageId = %s'
+search_select = 'SELECT login FROM users WHERE login LIKE %s'
 
 app = Flask("server")
 
@@ -214,6 +215,26 @@ def send_message():
         cursor.close()
         db.close()
         return {'answer' : 'Success'}
+
+@app.route('/searchLogin', methods = ['GET'])
+def search():
+    if request.method == 'GET':
+        responce = request.get_json()
+        db = get_db_connection()
+        cursor = db.cursor()
+
+        string_arg = '%' + responce['login_piece'] + '%'
+        cursor.execute(search_select, (string_arg,))
+        server_login_array = cursor.fetchall()
+
+        login_array = []
+        for i in range(len(server_login_array)):
+            login_array.append(server_login_array[i][0])
+
+        cursor.close()
+        db.close()
+
+        return {'data' : login_array}
 
 if __name__ == '__main__':
     app.run(debug = True)
