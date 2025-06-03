@@ -20,11 +20,25 @@ server_files_path = 'C:/Users/Proger/Desktop/server_files/'
 
 insert_file = 'INSERT INTO files (id, login1, login2, name, path) VALUES (%s, %s, %s, %s, %s)'
 select_files_lastId =  'SELECT id FROM files ORDER BY id DESC LIMIT 1'
+select_files = 'SELECT name FROM files WHERE (login1 = %s AND login2 = %s) OR (login1 = %s AND login2 = %s) ORDER BY id ASC'
 
 @app.route('/send_files', methods = ['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        return send_file(file_name, as_attachment = True, download_name = 'zxc.jpg')
+        responce = request.get_json()
+        db = get_db_connection()
+        cursor = db.cursor()
+
+        cursor.execute(select_files, (responce['login1'], responce['login2'], responce['login2'], responce['login1'],))
+        messages = cursor.fetchall()
+        files_array = []
+        for i in range(len(messages)):
+            files_array.append(messages[i][0])
+        
+        cursor.close()
+        db.close() 
+        return {'data' : files_array}
+        #return send_file(file_name, as_attachment = True, download_name = 'zxc.jpg')
     elif request.method == 'POST':
         responce = request.get_json()
         db = get_db_connection()
@@ -57,7 +71,7 @@ def login():
 
         add_file = (id, login1,  login2, name, path)
         cursor.execute(insert_file, add_file)
-        
+
         db.commit()
         cursor.close()
         db.close()   
