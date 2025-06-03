@@ -21,6 +21,7 @@ server_files_path = 'C:/Users/Proger/Desktop/server_files/'
 insert_file = 'INSERT INTO files (id, login1, login2, name, path) VALUES (%s, %s, %s, %s, %s)'
 select_files_lastId =  'SELECT id FROM files ORDER BY id DESC LIMIT 1'
 select_files = 'SELECT name FROM files WHERE (login1 = %s AND login2 = %s) OR (login1 = %s AND login2 = %s) ORDER BY id ASC'
+select_path = 'SELECT path FROM files WHERE (login1 = %s AND login2 = %s) OR (login1 = %s AND login2 = %s) AND name = %s;'
 
 @app.route('/send_files', methods = ['GET', 'POST'])
 def login():
@@ -76,6 +77,21 @@ def login():
         cursor.close()
         db.close()   
         return {'answer' : 'Succes'}
+
+@app.route('/download_file', methods = ['GET'])
+def download_file():
+    if request.method == 'GET':
+        responce = request.get_json()
+        db = get_db_connection()
+        cursor = db.cursor()
+
+        cursor.execute(select_path, (responce['login1'], responce['login2'], responce['login2'], responce['login1'], responce['name']))
+        path = cursor.fetchall()
+        
+        cursor.close()
+        db.close()
+        return send_file(path[0][0] + '/' + responce['name'], as_attachment = True, download_name = responce['name'])
+        
 
 if __name__ == '__main__':
     app.run(debug = True)

@@ -2,12 +2,13 @@ from tkinter import Label, Button, Frame
 
 class FilesWindow:
     last_page = 0
-    def __init__(self, root, files_array, chat, page, pages = None):
+    def __init__(self, root, files_array, chat, page, pages = None, download_file = None):
         self.window = root
         self.files_array = files_array
         self.chat = chat
         self.page = page
         self.pages = pages
+        self.download_file = download_file
 
     def clear(self):
         for widget in self.window.winfo_children():
@@ -20,13 +21,13 @@ class FilesWindow:
         frame.place(x = 0, y = 0)
 
         heading = Label(frame, text = 'Ваши вложения', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 23, 'bold'))
-        heading.place(x = 120, y = 10)
+        heading.place(x = 100, y = 10)
         
         y = 70
         if len(self.files_array) != 0:
             for i in range(len(self.files_array)):
                 user_button = Button(frame, width = 39, pady = 7, text = self.files_array[i], bg = '#57a1f8', fg = 'white', border = 0)
-                #user_button['command'] = lambda user_chat = self.chats_mas[i]: self.chat(user_chat)
+                user_button['command'] = lambda name = self.files_array[i]: self.download_file(name)
                 user_button.place(x = 65, y = y)
                 y += 50
         

@@ -35,6 +35,18 @@ def send_file():
             else:
                 messagebox.showinfo('Успешно', 'Файл отправлен')
 
+def download_file(name):
+    r = requests.get('http://127.0.0.1:5000/download_file', json = {'login1' : login1,
+                                                                    'login2' : login2,
+                                                                    'name' : name})
+    file_name = r.headers['Content-Disposition'].split('=')[1]
+    file_data = r.content
+
+    with open('C:/Users/Proger/Downloads/' + file_name, 'wb') as file:
+        file.write(file_data)
+    
+    messagebox.showinfo('Успешно', 'Файл ' + file_name + ' добавлен в загрузки')
+
 def get_files():
     clear()
     root.title('My chats')
@@ -44,7 +56,7 @@ def get_files():
     frame.place(x = 0, y = 0)
 
     heading = Label(frame, text = 'Ваши вложения', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 23, 'bold'))
-    heading.place(x = 120, y = 10)
+    heading.place(x = 100, y = 10)
 
     request = requests.get('http://127.0.0.1:5000/send_files', json = {'login1' : login1,
                                                                        'login2' : login2})
@@ -54,10 +66,10 @@ def get_files():
     data_split = [data[i:i+9] for i in range(0, len(data), 9)]
 
     if len(data_split) != 0:
-        pages = {1: FilesWindow(root = root, files_array = data_split[0], chat = chat, page = 1)}
+        pages = {1: FilesWindow(root = root, files_array = data_split[0], chat = chat, page = 1, download_file = download_file)}
         pages[1].pages = pages
         for i in range(1, len(data_split)):
-            pages[list(pages.keys())[-1] + 1] = FilesWindow(root = root, files_array = data_split[i], chat = chat, page = list(pages.keys())[-1] + 1, pages = pages)
+            pages[list(pages.keys())[-1] + 1] = FilesWindow(root = root, files_array = data_split[i], chat = chat, page = list(pages.keys())[-1] + 1, pages = pages, download_file = download_file)
         
         FilesWindow.last_page = list(pages.keys())[-1]
 
