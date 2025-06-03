@@ -10,6 +10,7 @@ from workTools.ChatsWindow import ChatsWindow
 from workTools.ChatLoadingMessage import ChatLoadingMessage
 from workTools.MessageHandler import MessageHandler
 from workTools.ServerRequests import ServerRequests
+from workTools.FilesWindow import FilesWindow
 
 root = Tk()
 log_img = PhotoImage(file = 'app/images/login.png')
@@ -125,6 +126,38 @@ def add_person2chats():
     Button(frame, width = 39, pady = 7, text = 'Добавить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda : serverRequests.check_login_in_bd(person_login.get(), login_password_id__array)).place(x = 55, y = 157)
     Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 207)
 
+def get_files(login2):
+    global thread_flag
+    thread_flag = False
+    clear()
+    root.title('My chats')
+    root.geometry('400x600')
+
+    frame = Frame(root, width = 350, height = 600, bg = "white")
+    frame.place(x = 0, y = 0)
+
+    heading = Label(frame, text = 'Ваши вложения', fg = '#57a1f8', bg = 'white', font = ('Microsoft YaHei UI Light', 23, 'bold'))
+    heading.place(x = 100, y = 10)
+
+    request = requests.get('http://127.0.0.1:5000/send_files', json = {'login1' : login_password_id__array[0],
+                                                                       'login2' : login2})
+    server_answer = json.loads(request.content.decode())
+    data = server_answer['data']
+
+    data_split = [data[i:i+9] for i in range(0, len(data), 9)]
+
+    if len(data_split) != 0:
+        pages = {1: FilesWindow(root = root, files_array = data_split[0], chat = chat, page = 1, download_file = serverRequests.download_file, login1 = login_password_id__array[0], login2 = login2)}
+        pages[1].pages = pages
+        for i in range(1, len(data_split)):
+            pages[list(pages.keys())[-1] + 1] = FilesWindow(root = root, files_array = data_split[i], chat = chat, page = list(pages.keys())[-1] + 1, pages = pages, download_file = serverRequests.download_file, login1 = login_password_id__array[0], login2 = login2)
+        
+        FilesWindow.last_page = list(pages.keys())[-1]
+
+        pages[1].draw()
+    else:
+        Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = chat).place(x = 65, y = 70)
+
 def chat(user_chat):
     global thread_flag
     thread_flag = True
@@ -144,8 +177,10 @@ def chat(user_chat):
     entry_field = Text(height=5, wrap="char")
 
     Frame(frame, width = 400, height = 2, bg = 'black').place(x = 0, y = 90)
-    Button(frame, width = 39, pady = 7, text = 'Отправить', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: send_message(entry_field.get("1.0", END), canvas, user_chat, entry_field)).place(x = 55, y = 100)
-    Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 55, y = 150)
+    Button(frame, width = 23, pady = 7, text = 'Отправить cooбщение', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: send_message(entry_field.get("1.0", END), canvas, user_chat, entry_field)).place(x = 20, y = 100)
+    Button(frame, width = 23, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = main_menu).place(x = 20, y = 150)
+    Button(frame, width = 23, pady = 7, text = 'Отправить файл', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: serverRequests.send_file(login_password_id__array[0], user_chat)).place(x = 200, y = 100)
+    Button(frame, width = 23, pady = 7, text = 'Вложения', bg = '#57a1f8', fg = 'white', border = 0, command = lambda: get_files(user_chat)).place(x = 200, y = 150)
 
     root.protocol("WM_DELETE_WINDOW")
     login1_mas, message_mas = serverRequests.show_history_messages(user_chat, login_password_id__array)

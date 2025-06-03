@@ -15,7 +15,6 @@ def get_db_connection():
     )
 
 app = Flask("server")
-file_name = 'kiyotaka.jpg'
 server_files_path = 'C:/Users/Proger/Desktop/server_files/'
 
 insert_file = 'INSERT INTO files (id, login1, login2, name, path) VALUES (%s, %s, %s, %s, %s)'
@@ -39,7 +38,7 @@ def login():
         cursor.close()
         db.close() 
         return {'data' : files_array}
-        #return send_file(file_name, as_attachment = True, download_name = 'zxc.jpg')
+    
     elif request.method == 'POST':
         responce = request.get_json()
         db = get_db_connection()
