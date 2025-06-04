@@ -1,1 +1,2 @@
-Messanger project for Compass plus
+# MyMes
+MyMes - project for IT school from compass plus

@@ -1,0 +1,5 @@
+HOST = "localhost"
+USER = "root"
+AUTH_PLAGIN = "mysql_native_password"
+PASSWORD = "semechko210609"
+DATABASE = "testdb"
