@@ -1,6 +1,8 @@
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 import requests
 import json
+import base64
+import urllib.parse
 
 class ServerRequests:
     def __init__(self, main_menu, add_person2chats, registration, login):
@@ -86,3 +88,37 @@ class ServerRequests:
             messagebox.showinfo('Отклонено', 'Слишком большое сообщение')
         else:
             return 'Success'
+        
+    def send_file(self, login1, login2):
+        filepath = filedialog.askopenfilename()
+        if filepath != "":
+            file_name = filepath.split('/')[-1]
+            with open(filepath, "rb") as file:
+                data = file.read()
+                data_b64 = base64.b64encode(data).decode('utf-8')
+                request = requests.post('http://127.0.0.1:5000/send_files', json = {'login1' : login1,
+                                                                        'login2' : login2,
+                                                                        'file_name' : file_name,
+                                                                        'file_data' : data_b64})
+                server_answer = json.loads(request.content.decode())
+                answer = server_answer['answer']
+                if answer == 'Denied':
+                    messagebox.showinfo('Ошибка', 'Файл с таким названием уже есть')
+                else:
+                    messagebox.showinfo('Успешно', 'Файл отправлен')
+        
+    def download_file(self, login1, login2, name):
+        request = requests.get('http://127.0.0.1:5000/download_file', json = {'login1' : login1,
+                                                                        'login2' : login2,
+                                                                        'name' : name})
+        if '*' in request.headers['Content-Disposition']:
+            parse_string = request.headers['Content-Disposition'].split("'")[-1]
+            file_name = urllib.parse.unquote(parse_string)
+        else:
+            file_name = request.headers['Content-Disposition'].split('=')[1]
+        file_data = request.content
+
+        with open('C:/Users/Proger/Downloads/' + file_name, 'wb') as file:
+            file.write(file_data)
+        
+        messagebox.showinfo('Успешно', 'Файл ' + file_name + ' добавлен в загрузки')
