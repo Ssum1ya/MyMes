@@ -23,3 +23,11 @@ CREATE TABLE new_messages(
     login1 VARCHAR(20) NOT NULL,
     login2 VARCHAR(20) NOT NULL
 );
+
+CREATE TABLE files(
+	id BIGINT NOT NULL PRIMARY KEY,
+    login1 VARCHAR(20) NOT NULL,
+    login2 VARCHAR(20) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    path VARCHAR(255) NOT NULL
+);
