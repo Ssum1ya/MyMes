@@ -156,7 +156,7 @@ def get_files(login2):
 
         pages[1].draw()
     else:
-        Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = chat).place(x = 65, y = 70)
+        Button(frame, width = 39, pady = 7, text = 'Назад', bg = '#57a1f8', fg = 'white', border = 0, command = lambda : chat(login2)).place(x = 65, y = 70)
 
 def chat(user_chat):
     global thread_flag
